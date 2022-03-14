@@ -172,7 +172,54 @@ public class Trie {
         return false;
     }
 
-    public void print() {
+    // ***printPreOrder***
+    public void printPreOrder() {
+        System.out.print("PreOrder:");
+        int count = 0;
         
+        // For every child, print its content.
+        // If it is null, add it to the count
+        for (TrieNode child : root.children) {
+            if (printPreOrder(child)) {
+                count++;
+            }
+        }
+        
+        // If count is 26 then it is
+        // a terminal node
+        if (count == 26) {
+            System.out.print("#");
+        }
+        System.out.println("\n");
+    }
+    
+    // ***printPreOrder***
+    public boolean printPreOrder(TrieNode node) {
+        if (node == null) {
+            return true;
+        }
+        int count = 0;
+
+        System.out.print(' ' + node.content);
+        
+        // For every child, print its content.
+        // If it is null, add it to the count
+        for (TrieNode child : node.children) {
+            if (printPreOrder(child)) {
+                count++;
+            }
+        }
+        
+        // If count is 26 then it is
+        // a terminal node
+        if (count == 26) {
+            System.out.print("#");
+        }
+
+        return false;
+    }
+
+    public void printDictionary() {
+        System.out.println("\n***** Dictionary *****");
     }
 }

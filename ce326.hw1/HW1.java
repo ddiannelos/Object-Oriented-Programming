@@ -39,10 +39,10 @@ public class HW1 {
                         words[1] = words[1].toLowerCase();
 
                         if (trie.removeWord(words[1])) {
-                            System.out.println("RMV " + words[1] + " OK*");
+                            System.out.println("RMV " + words[1] + " OK");
                         }
                         else {
-                            System.out.println("RMV " + words[1] + " NOK*");
+                            System.out.println("RMV " + words[1] + " NOK");
                         }
                     }
 
@@ -56,19 +56,33 @@ public class HW1 {
                         words[1] = words[1].toLowerCase();
 
                         if (trie.findWord(words[1])) {
-                            System.out.println("FND " + words[1] + " OK*");
+                            System.out.println("FND " + words[1] + " OK");
                         }
                         else {
-                            System.out.println("FND " + words[1] + " NOK*");
+                            System.out.println("FND " + words[1] + " NOK");
                         }
                     }
                     
                     break;
                 }
                 case "-p": {
+                    if (words.length > 1) {
+                        System.out.println("Wrong number of arguments on option");
+                    }
+                    else {
+                        trie.printPreOrder();
+                    }
+
                     break;
                 }
                 case "-d": {
+                    if (words.length > 1) {
+                        System.out.println("Wrong number of arguments on option");
+                    }
+                    else {
+
+                    }
+                    
                     break;
                 }
                 case "-w": {
