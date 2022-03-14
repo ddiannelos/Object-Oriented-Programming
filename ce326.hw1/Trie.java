@@ -1,11 +1,11 @@
 public class Trie {
     public TrieNode root = new TrieNode(false);
 
-    // ***insertWord***//
+    // ***insertWord***
     public boolean insertWord(String word) {
         TrieNode current = root;
         
-        // Check if the child, with the appropriate
+        // Check if the child with the appropriate
         // position in the array, exists
         while (current.children[word.charAt(0)-'a'] != null) {
             int i;
@@ -72,10 +72,11 @@ public class Trie {
         return true;   
     }
 
+    // ***removeWord***
     public boolean removeWord(String word) {
         TrieNode current = root;
 
-        // Check if the child, with the appropriate
+        // Check if the child with the appropriate
         // position in the array, exists
         while (current.children[word.charAt(0)-'a'] != null) {
             int i;
@@ -138,28 +139,33 @@ public class Trie {
         return false;
     }
 
+    // ***findWord***
     public boolean findWord(String word) {
         TrieNode current = root;
 
+        // Check if the child in the approriate
+        // position in the array, exists
         while (current.children[word.charAt(0)-'a'] != null) {
             int i;
             TrieNode child = current.children[word.charAt(0)-'a'];
 
+            // Try to find if the two strings differ
             for (i = 0; i < child.content.length(); i++) {
                 if (i == word.length() || word.charAt(0) != child.content.charAt(0)) {
                     return false;
                 }
             }
-
-            if (i == child.content.length() && i == word.length()) {
+            
+            // Check if child's string is a substring of 
+            // the word. If it is go to a lower level. 
+            // Else if they are the same, check if it 
+            // is a word
+            if (i == word.length()) {
                 return (child.isWord) ? true : false;
             }
-            else if (i == child.content.length() && i < word.length()) {
+            else {
                 word = word.substring(i, word.length());
                 current = child;
-            }
-            else {
-                return false;
             }
         }
         
