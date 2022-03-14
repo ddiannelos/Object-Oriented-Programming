@@ -171,4 +171,8 @@ public class Trie {
         
         return false;
     }
+
+    public void print() {
+        
+    }
 }
