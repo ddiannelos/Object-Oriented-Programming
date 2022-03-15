@@ -22,10 +22,10 @@ public class HW1 {
                         words[1] = words[1].toLowerCase();
                         
                         if (trie.insertWord(words[1])) {
-                            System.out.println("ADD " + words[1] + " OK*");
+                            System.out.println("ADD " + words[1] + " OK");
                         }
                         else {
-                            System.out.println("ADD " + words[1] + " NOK*");
+                            System.out.println("ADD " + words[1] + " NOK");
                         }
                     }
                     
@@ -80,7 +80,7 @@ public class HW1 {
                         System.out.println("Wrong number of arguments on option");
                     }
                     else {
-
+                        trie.printDictionary();
                     }
                     
                     break;

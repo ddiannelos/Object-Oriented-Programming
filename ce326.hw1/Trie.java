@@ -90,14 +90,19 @@ public class Trie {
             }
 
             // If this position is equal to the child's string length
-            // and the word's string length then check how many children
-            // the child has. If they are more than 2, then inform isWord,
-            // else if it has only one child, then merge the 2 nodes,
-            // else if it has no children remove the node 
+            // and the word's string length then check if this child's
+            // string is a word and how many children the child has. If 
+            // they are more than 2, then change isWord, else if it has 
+            // only one child, then merge the 2 nodes, else if it has no 
+            // children remove the node 
             if (i == child.content.length() && i == word.length()) {
+                if (!child.isWord) {
+                    return false;
+                }
+
                 int count = 0;
                 TrieNode childToMove = null;
-
+                
                 for (TrieNode temp : child.children) {
                     if (temp != null) {
                         childToMove = temp;
@@ -173,27 +178,6 @@ public class Trie {
     }
 
     // ***printPreOrder***
-    public void printPreOrder() {
-        System.out.print("PreOrder:");
-        int count = 0;
-        
-        // For every child, print its content.
-        // If it is null, add it to the count
-        for (TrieNode child : root.children) {
-            if (printPreOrder(child)) {
-                count++;
-            }
-        }
-        
-        // If count is 26 then it is
-        // a terminal node
-        if (count == 26) {
-            System.out.print("#");
-        }
-        System.out.println("\n");
-    }
-    
-    // ***printPreOrder***
     public boolean printPreOrder(TrieNode node) {
         if (node == null) {
             return true;
@@ -219,7 +203,50 @@ public class Trie {
         return false;
     }
 
+    // ***printPreOrder***
+    public void printPreOrder() {
+        System.out.print("PreOrder:");
+        int count = 0;
+        
+        // For every child, print its content.
+        // If it is null, add it to the count
+        for (TrieNode child : root.children) {
+            if (printPreOrder(child)) {
+                count++;
+            }
+        }
+        
+        // If count is 26 then it is
+        // a terminal node
+        if (count == 26) {
+            System.out.print("#");
+        }
+        System.out.println(" \n");
+    }
+
+    // ***printDictionary***
+    public void printDictionary(TrieNode node, String word) {
+        if (node.isWord) {
+            System.out.println(word);
+        }
+        
+        for (TrieNode temp : node.children) {
+            if (temp != null) {
+                printDictionary(temp, word + temp.content);
+            }
+        }
+    }
+
+    // ***printDictionary***
     public void printDictionary() {
         System.out.println("\n***** Dictionary *****");
+        
+        for (TrieNode node : root.children) {
+            if (node != null) {
+                printDictionary(node, node.content);
+            }
+        }
+
+        System.out.println();
     }
 }
