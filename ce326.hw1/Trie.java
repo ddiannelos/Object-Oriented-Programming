@@ -315,6 +315,7 @@ public class Trie {
         }
     }
 
+    // ***findDistantWords***
     public void findDistantWords(String word, int diff) {
         System.out.println("\nDistant words of " + word + " (" + diff + ")");
         
@@ -326,6 +327,7 @@ public class Trie {
         System.out.println();        
     }
 
+    // ***endsWith
     public void endsWith(TrieNode node, String suffix, String wordToPrint) {
         if (node.isWord) {
            if ((wordToPrint+node.content).endsWith(suffix)) {
@@ -340,6 +342,7 @@ public class Trie {
         }
     }
 
+    // ***endsWith***
     public void endsWith(String suffix) {
         System.out.println("\nWords with suffix " + suffix + ":");
 
