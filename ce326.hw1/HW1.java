@@ -119,7 +119,6 @@ public class HW1 {
                     System.out.println("OPTION NOT AVAILABLE");
                 }
             }
-            
             System.out.print("?:");
         }
         sc.close();
