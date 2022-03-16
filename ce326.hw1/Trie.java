@@ -1,5 +1,9 @@
 public class Trie {
-    public TrieNode root = new TrieNode(false);
+    public TrieNode root = new TrieNode(false, null);
+
+    public Trie() {
+        root.parent = root;
+    }
 
     // ***insertWord***
     public boolean insertWord(String word) {
@@ -45,7 +49,7 @@ public class Trie {
             else if (i < child.content.length() && i == word.length()) {
                 String temp = child.content.substring(i,child.content.length());
                 
-                current.children[word.charAt(0)-'a'] = new TrieNode(true, word);
+                current.children[word.charAt(0)-'a'] = new TrieNode(true, current, word);
                 current = current.children[word.charAt(0)-'a'];
                 
                 word = temp;
@@ -58,7 +62,7 @@ public class Trie {
                 TrieNode temp = child;
                 temp.content = temp.content.substring(i, temp.content.length());
                 
-                current.children[word.charAt(0)-'a'] = new TrieNode(false, word.substring(0, i));
+                current.children[word.charAt(0)-'a'] = new TrieNode(false, current, word.substring(0, i));
                 current = current.children[word.charAt(0)-'a'];
                 current.children[temp.content.charAt(0)-'a'] = temp;
                 
@@ -67,9 +71,9 @@ public class Trie {
         }
 
         // Make a new node for the word
-        current.children[word.charAt(0)-'a'] = new TrieNode(true, word);
+        current.children[word.charAt(0)-'a'] = new TrieNode(true, current, word);
         
-        return true;   
+        return true;
     }
 
     // ***removeWord***
@@ -79,40 +83,55 @@ public class Trie {
         // Check if the child with the appropriate
         // position in the array, exists
         while (current.children[word.charAt(0)-'a'] != null) {
-            int i;
             TrieNode child = current.children[word.charAt(0)-'a'];
+            // Compare child's string length with 
+            // the word's length
+            int diff = child.content.length() - word.length();
             
-            // Find the position the two strings differ
-            for (i = 0; i < child.content.length(); i++) {
-                if (i == word.length() || child.content.charAt(i) != word.charAt(i)) {
-                    break;
-                }
+            // If child's string length is bigger
+            // then there is no word that can be
+            // deleted 
+            if (diff > 0) {
+                return false;
             }
+            // Else if word's length is bigger
+            // then if child's string is inside
+            // the word remove the string from
+            // the word and continue, else 
+            // if it isn't inside the word,
+            // then there is no word that can be
+            // deleted
+            else if (diff < 0) {
+                if (!word.startsWith(child.content)) {
+                    return false;
+                }
+                word = word.substring(child.content.length(), word.length());
+                current = child;
+            }
+            // Else compare child's string and word.
+            // If they are different and the child 
+            // is not a word then there is no word
+            // that can be deleted. Else remove the
+            // child depending on how many children
+            // they have and then balance the tree
+            else {
+                diff = child.content.compareTo(word);
 
-            // If this position is equal to the child's string length
-            // and the word's string length then check if this child's
-            // string is a word and how many children the child has. If 
-            // they are more than 2, then change isWord, else if it has 
-            // only one child, then merge the 2 nodes, else if it has no 
-            // children remove the node 
-            if (i == child.content.length() && i == word.length()) {
-                if (!child.isWord) {
+                if (diff != 0 && !child.isWord) {
                     return false;
                 }
 
                 int count = 0;
                 TrieNode childToMove = null;
-                
+
                 for (TrieNode temp : child.children) {
                     if (temp != null) {
                         childToMove = temp;
-
                         if (++count == 2) {
                             break;
                         }
                     }
                 }
-
                 if (count == 2) {
                     child.isWord = false;
                 }
@@ -123,22 +142,27 @@ public class Trie {
                 else {
                     current.children[word.charAt(0)-'a'] = null;
                 }
+                
+                if (current.isWord == false) {
+                    count = 0;
+                    childToMove = null;
+
+                    for (TrieNode temp : current.children) {
+                        if (temp!= null) {
+                            childToMove = temp;
+                            if (++count == 2) {
+                                break;
+                            }
+                        }
+                    }
+                    if (count == 1) {
+                        childToMove.content = current.content + childToMove.content;
+                        current.parent.children[childToMove.content.charAt(0)-'a'] = childToMove;
+                    }
+                }
 
                 return true;
-            }
-            // Else if the position is equal to the child's string length and
-            // less than the word's length then remove from word the child's
-            // string, go to a lower level of the trie and continue
-            else if (i == child.content.length() && i < word.length()) {
-                word = word.substring(i, word.length());
-                current = child;
-
-            }
-            // Else if the position is less than the child's string length
-            // then the word doesn't exist in the dictionary
-            else {
-                return false;
-            }
+            }   
         }
         
         return false;
@@ -225,14 +249,14 @@ public class Trie {
     }
 
     // ***printDictionary***
-    public void printDictionary(TrieNode node, String word) {
+    public void printDictionary(TrieNode node, String wordToPrint) {
         if (node.isWord) {
-            System.out.println(word);
+            System.out.println(wordToPrint);
         }
         
         for (TrieNode temp : node.children) {
             if (temp != null) {
-                printDictionary(temp, word + temp.content);
+                printDictionary(temp, wordToPrint + temp.content);
             }
         }
     }
@@ -241,12 +265,88 @@ public class Trie {
     public void printDictionary() {
         System.out.println("\n***** Dictionary *****");
         
-        for (TrieNode node : root.children) {
-            if (node != null) {
-                printDictionary(node, node.content);
+        for (TrieNode temp : root.children) {
+            if (temp != null) {
+                printDictionary(temp, temp.content);
             }
         }
 
         System.out.println();
+    }
+
+    public void findDistantWords(TrieNode node, String word, int diff, int count, String wordToPrint) {        
+        int i;
+        
+        for (i = 0; i < node.content.length(); i++) {
+            if (i == word.length()) {
+                break;
+            }
+            else if (node.content.charAt(i) != word.charAt(i)) {
+                if (++count > diff) {
+                    break;
+                }
+            }
+        }
+        if (count > diff) {
+            return;
+        }
+
+        if (i == word.length()) {
+            if (node.content.length()-word.length()+count > diff) {
+                return;
+            }
+        }
+        skip : {
+            if (i == node.content.length()) {
+                if (word.length()-node.content.length()+count > diff) {
+                    break skip;
+                }
+            }  
+            
+            if (node.isWord && diff == count) {
+                System.out.println(wordToPrint+node.content);
+            }
+        }
+        
+        for (TrieNode temp : node.children) {
+            if (temp != null) {
+                findDistantWords(temp, word.substring(i, word.length()), diff, count, wordToPrint+node.content);
+            }
+        }
+    }
+
+    public void findDistantWords(String word, int diff) {
+        System.out.println("\nDistant words of " + word + " (" + diff + ")");
+        
+        for (TrieNode temp : root.children) {
+            if (temp != null) {
+                findDistantWords(temp, word, diff, 0, "");
+            }
+        }
+        System.out.println();        
+    }
+
+    public void endsWith(TrieNode node, String suffix, String wordToPrint) {
+        if (node.isWord) {
+           if ((wordToPrint+node.content).endsWith(suffix)) {
+               System.out.println(wordToPrint+node.content);
+           } 
+        }
+
+        for (TrieNode temp : node.children) {
+            if (temp != null) {
+                endsWith(temp, suffix, wordToPrint+node.content);
+            }
+        }
+    }
+
+    public void endsWith(String suffix) {
+        System.out.println("\nWords with suffix " + suffix + ":");
+
+        for (TrieNode temp : root.children) {
+            if (temp != null) {
+                endsWith(temp, suffix, "");
+            }
+        }
     }
 }

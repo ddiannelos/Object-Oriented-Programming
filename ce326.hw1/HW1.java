@@ -15,7 +15,7 @@ public class HW1 {
 
             switch (words[0]) {
                 case "-i": {
-                    if (words.length > 2) {
+                    if (words.length != 2) {
                         System.out.println("Wrong number of arguments on option");
                     }
                     else {
@@ -32,7 +32,7 @@ public class HW1 {
                     break;
                 }
                 case "-r": {
-                    if (words.length > 2) {
+                    if (words.length != 2) {
                         System.out.println("Wrong number of arguments on option");
                     }
                     else {
@@ -49,7 +49,7 @@ public class HW1 {
                     break;
                 }
                 case "-f": {
-                    if (words.length > 2) {
+                    if (words.length != 2) {
                         System.out.println("Wrong number of arguments on option");
                     }
                     else {
@@ -66,7 +66,7 @@ public class HW1 {
                     break;
                 }
                 case "-p": {
-                    if (words.length > 1) {
+                    if (words.length != 1) {
                         System.out.println("Wrong number of arguments on option");
                     }
                     else {
@@ -76,7 +76,7 @@ public class HW1 {
                     break;
                 }
                 case "-d": {
-                    if (words.length > 1) {
+                    if (words.length != 1) {
                         System.out.println("Wrong number of arguments on option");
                     }
                     else {
@@ -86,9 +86,29 @@ public class HW1 {
                     break;
                 }
                 case "-w": {
+                    if (words.length != 3) {
+                        System.out.println("Wrong number of arguments on option");
+                    }
+                    else {
+                        try {
+                            Integer diff = Integer.valueOf(words[2]);
+
+                            trie.findDistantWords(words[1], diff);
+                        }
+                        catch (Exception e) {
+                            System.out.println("Wrong arguments on option");
+                        }
+                    }
+
                     break;
                 }
                 case "-s": {
+                    if (words.length > 2) {
+                        System.out.println("Wrong number of arguments on option");
+                    }
+                    else {
+                        trie.endsWith(words[1]);
+                    }
                     break;
                 }
                 case "-q": {
