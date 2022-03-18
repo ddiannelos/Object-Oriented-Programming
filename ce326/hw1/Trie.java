@@ -43,13 +43,19 @@ public class Trie {
             // Else if the position is less than the child's string length and
             // equal to the word's length then make a new node for the word,
             // remove from child's string the word, set the new child's string
-            // as the word, go to a lower level of the trie and continue
+            // as the word, copy child's children to the new node,
+            // go to a lower level of the trie and continue
             else if (i < child.content.length() && i == word.length()) {
                 String temp = child.content.substring(i,child.content.length());
                 
                 current.children[word.charAt(0)-'a'] = new TrieNode(true, word);
-                current = current.children[word.charAt(0)-'a'];
                 
+                for (int j = 0; j < child.children.length; j++) {
+                    current.children[word.charAt(0)-'a'].children[i] = child.children[i];
+                }
+                
+                current = current.children[word.charAt(0)-'a'];
+            
                 word = temp;
             }
             // Else make a new node for the substring of the word (from the 
