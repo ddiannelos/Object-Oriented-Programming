@@ -89,7 +89,7 @@ public class Trie {
         int diff = child.content.length()-word.length();
 
         // If child's string lenghth is bigger
-        // then tehre is no word that can be
+        // then there is no word that can be
         // deleted
         if (diff > 0) {
             return false;
@@ -138,8 +138,11 @@ public class Trie {
                 child.isWord = false;
             }
             else if (count == 1) {
-                childToMove.content = child.content+childToMove.content;
-                node.children[word.charAt(0)-'a'] = childToMove;
+                for (int i = 0; i < child.children.length; i++) {
+                    child.children[i] = childToMove.children[i];
+                }
+                node.children[word.charAt(0)-'a'].content = node.children[word.charAt(0)-'a'].content + childToMove.content;
+                node.children[word.charAt(0)-'a'].isWord = childToMove.isWord;
             }
             else {
                 node.children[word.charAt(0)-'a'] = null;
