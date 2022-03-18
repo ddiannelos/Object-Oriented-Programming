@@ -9,9 +9,9 @@ public class HW1 {
         String line;
         Trie trie = new Trie();
 
-        while (sc.hasNextLine()) {
-            System.out.println("?: ");
+        System.out.println("?: ");
 
+        while (sc.hasNextLine()) {
             line = sc.nextLine();
             String[] words = line.split(" ");
 
@@ -121,6 +121,7 @@ public class HW1 {
                     System.out.println("OPTION NOT AVAILABLE");
                 }
             }
+            System.out.println("?: ");
         }
         sc.close();
     }
