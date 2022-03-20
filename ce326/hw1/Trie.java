@@ -169,13 +169,8 @@ public class Trie {
                 }
             }
             if (count == 1) {
-                // for (int i = 0; i < child.children.length; i++) {
-                //     child.children[i] = childToMove.children[i];
-                // }
                 childToMove.content = child.content + childToMove.content;
                 node.children[word.charAt(0)-'a'] = childToMove;
-                // node.children[word.charAt(0)-'a'].content = node.children[word.charAt(0)-'a'].content + childToMove.content;
-                // node.children[word.charAt(0)-'a'].isWord = childToMove.isWord;
             }
             if (count == 0) {
                 node.children[word.charAt(0)-'a'] = null;
