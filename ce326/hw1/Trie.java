@@ -3,6 +3,59 @@ package ce326.hw1;
 public class Trie {
     public TrieNode root = new TrieNode(false, null);
 
+    public boolean insertWord(TrieNode node, String word) {
+        TrieNode child = node.children[word.charAt(0)-'a'];
+
+        if (child == null) {
+            node.children[word.charAt(0)-'a'] = new TrieNode(true, word);
+            return true;
+        }
+
+        int i = 0;
+
+        for (; i < child.content.length(); i++) {
+            if (i == word.length() || child.content.charAt(i) != word.charAt(i)) {
+                break;
+            }
+        }
+
+        if (i == word.length()) {
+            if (i == child.content.length()) {
+                if (child.isWord == false) {
+                    child.isWord = true;
+                    return true;
+                }
+                else return false;
+            }
+            else {
+                node.children[word.charAt(0)-'a'] = new TrieNode(true, word);
+                child.content = child.content.substring(i, child.content.length());
+                node.children[word.charAt(0)-'a'].children[child.content.charAt(0)-'a'] = child;
+                
+                return true;
+            }
+        }
+        else {
+            if (i == child.content.length()) {
+                return insertWord(node.children[word.charAt(0)-'a'], word.substring(i, word.length()));
+            }
+            else {
+                node.children[word.charAt(0)-'a'] = new TrieNode(false, word.substring(0, i));
+                child.content = child.content.substring(i, child.content.length());
+                node.children[word.charAt(0)-'a'].children[child.content.charAt(0)-'a'] = child;
+                insertWord(node.children[word.charAt(0)-'a'], word.substring(i, word.length()));
+
+                return true;
+            }
+        }
+    }
+
+
+    public boolean insertWord(String word) {
+        return insertWord(root, word);
+    }
+
+    /*
     // ***insertWord***
     public boolean insertWord(String word) {
         TrieNode current = root;
@@ -79,7 +132,7 @@ public class Trie {
 
         return true;
     }
-
+*/
     // ***removeWord***
     public boolean removeWord (TrieNode node, String word) {
         TrieNode child = node.children[word.charAt(0)-'a'];
