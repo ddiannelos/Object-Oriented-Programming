@@ -3,9 +3,12 @@ package ce326.hw1;
 public class Trie {
     public TrieNode root = new TrieNode(false, null);
 
+    // ***insertWord***
     public boolean insertWord(TrieNode node, String word) {
         TrieNode child = node.children[word.charAt(0)-'a'];
 
+        // Check if the child with the appropriate
+        // position in the array, exists
         if (child == null) {
             node.children[word.charAt(0)-'a'] = new TrieNode(true, word);
             return true;
@@ -13,12 +16,20 @@ public class Trie {
 
         int i = 0;
 
+        // Find the position the two strings differ
         for (; i < child.content.length(); i++) {
             if (i == word.length() || child.content.charAt(i) != word.charAt(i)) {
                 break;
             }
         }
 
+        // If the end of the word was reached, 
+        // check if the position i is equal 
+        // to the child's string length and then
+        // if it is a word, do the appropriate 
+        // changes. Else make a new node for
+        // the word and move the new child to 
+        // the appropriate
         if (i == word.length()) {
             if (i == child.content.length()) {
                 if (child.isWord == false) {
@@ -35,6 +46,15 @@ public class Trie {
                 return true;
             }
         }
+        // Else if word's end wasn't reached,
+        // check if the position is equal to
+        // the child's string length, if it
+        // is insert the remaining word to the
+        // trie, else make a new node for the
+        // substring that is same, move the
+        // child to the appropriate position,
+        // after changing the string, and insert 
+        // the remaining word to the trie
         else {
             if (i == child.content.length()) {
                 return insertWord(node.children[word.charAt(0)-'a'], word.substring(i, word.length()));
@@ -50,89 +70,12 @@ public class Trie {
         }
     }
 
-
+    // ***insertWord***
     public boolean insertWord(String word) {
         return insertWord(root, word);
     }
 
-    /*
-    // ***insertWord***
-    public boolean insertWord(String word) {
-        TrieNode current = root;
-        
-        // Check if the child with the appropriate
-        // position in the array, exists
-        while (current.children[word.charAt(0)-'a'] != null) {
-            int i;
-            TrieNode child = current.children[word.charAt(0)-'a'];
-            
-            // Find the position the two strings differ
-            for (i = 0; i < child.content.length(); i++) {
-                if (i == word.length() || child.content.charAt(i) != word.charAt(i)) {
-                    break;
-                }
-            }
-
-            // If this position is equal to the child's string length
-            // and the word's string length then check if the word 
-            // already exists in the trie
-            if (i == child.content.length() && i == word.length()) {
-                if (child.isWord) {
-                    return false;
-                }
-                else {
-                    child.isWord = true;
-                    
-                    return true;
-                }
-            }
-            // Else if the position is equal to the child's string length and
-            // less than the word's length then remove from word the child's
-            // string, go to a lower level of the trie and continue
-            else if (i == child.content.length() && i < word.length()) {
-                word = word.substring(i, word.length());
-                current = child;
-            }
-            // Else if the position is less than the child's string length and
-            // equal to the word's length then make a new node for the word,
-            // remove from child's string the word, set the new child's string
-            // as the word, copy child's children to the new node,
-            // go to a lower level of the trie and continue
-            else if (i < child.content.length() && i == word.length()) {
-                String temp = child.content.substring(i,child.content.length());
-                
-                current.children[word.charAt(0)-'a'] = new TrieNode(true, word);
-                
-                for (int j = 0; j < child.children.length; j++) {
-                    current.children[word.charAt(0)-'a'].children[i] = child.children[i];
-                }
-                
-                current = current.children[word.charAt(0)-'a'];
-            
-                word = temp;
-            }
-            // Else make a new node for the substring of the word (from the 
-            // beginning till the position), remove this substring from child's 
-            // string and word, set the new node as the child, move the previous
-            // child to a lower level, go to the new node and continue
-            else {
-                TrieNode temp = child;
-                temp.content = temp.content.substring(i, temp.content.length());
-                
-                current.children[word.charAt(0)-'a'] = new TrieNode(false, word.substring(0, i));
-                current = current.children[word.charAt(0)-'a'];
-                current.children[temp.content.charAt(0)-'a'] = temp;
-                
-                word = word.substring(i, word.length());
-            }
-        }
-
-        // Make a new node for the word
-        current.children[word.charAt(0)-'a'] = new TrieNode(true, word);
-
-        return true;
-    }
-*/
+   
     // ***removeWord***
     public boolean removeWord (TrieNode node, String word) {
         TrieNode child = node.children[word.charAt(0)-'a'];
@@ -213,7 +156,7 @@ public class Trie {
         // If the node is a word then
         // balance the tree after the
         // removal of a node
-        if (node.isWord == false) {
+        if (child.isWord == false) {
             int count = 0;
             TrieNode childToMove = null;
 
@@ -226,11 +169,16 @@ public class Trie {
                 }
             }
             if (count == 1) {
-                for (int i = 0; i < child.children.length; i++) {
-                    child.children[i] = childToMove.children[i];
-                }
-                node.children[word.charAt(0)-'a'].content = node.children[word.charAt(0)-'a'].content + childToMove.content;
-                node.children[word.charAt(0)-'a'].isWord = childToMove.isWord;
+                // for (int i = 0; i < child.children.length; i++) {
+                //     child.children[i] = childToMove.children[i];
+                // }
+                childToMove.content = child.content + childToMove.content;
+                node.children[word.charAt(0)-'a'] = childToMove;
+                // node.children[word.charAt(0)-'a'].content = node.children[word.charAt(0)-'a'].content + childToMove.content;
+                // node.children[word.charAt(0)-'a'].isWord = childToMove.isWord;
+            }
+            if (count == 0) {
+                node.children[word.charAt(0)-'a'] = null;
             }
         }
 
