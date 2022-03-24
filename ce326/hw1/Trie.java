@@ -1,7 +1,7 @@
 package ce326.hw1;
 
 public class Trie {
-    public TrieNode root = new TrieNode(false, null);
+    private TrieNode root = new TrieNode(false, null);
 
     // ***insertWord***
     public boolean insertWord(TrieNode node, String word) {
