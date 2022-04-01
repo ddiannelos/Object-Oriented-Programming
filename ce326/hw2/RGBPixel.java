@@ -5,14 +5,13 @@ public class RGBPixel {
     private byte green;
     private byte blue;
 
-    // ***RGBPixel***
+    // ******Constructors******
     public RGBPixel(short red, short green, short blue) {
         this.red = (byte) (red - 128);
         this.green = (byte) (green - 128);
         this.blue = (byte) (blue - 128);
     }
     
-    // ***RGBPixel***
     public RGBPixel(RGBPixel pixel) {
         red = (byte) (pixel.getRed() - 128);
         green = (byte ) (pixel.getGreen() - 128);
@@ -23,6 +22,7 @@ public class RGBPixel {
 
     // }
     
+    // ******Methods******
     // ***getRed***
     public short getRed() {
         return (short) (red + 128);
@@ -57,8 +57,8 @@ public class RGBPixel {
     public int getRGB() {
         int value = 0;
 
-        value |= red << 8;
-        value |= green << 4;
+        value |= red << 16;
+        value |= green << 8;
         value |= blue;
 
         return value;
