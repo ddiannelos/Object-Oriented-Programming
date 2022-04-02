@@ -16,11 +16,10 @@ public class RGBImage implements Image {
     }
 
     public RGBImage(RGBImage copyImg) {
-        image = new RGBPixel[copyImg.getHeight()][copyImg.getWidth()];
-        colordepth = copyImg.getColorDepth();
-
-        for (int i = 0; i < copyImg.getHeight(); i++) {
-            for (int j = 0; j < copyImg.getWidth(); j++) {               
+        this(copyImg.getWidth(), copyImg.getHeight(), copyImg.getColorDepth());
+        
+        for (int i = 0; i < this.getHeight(); i++) {
+            for (int j = 0; j < this.getWidth(); j++) {               
                 setPixel(i, j, copyImg.getPixel(i, j));
             }
         }
@@ -51,9 +50,26 @@ public class RGBImage implements Image {
         return image[row][col];
     }
 
+    // ***getImage***
+    public RGBPixel[][] getImage() {
+        return image;
+    }
+
+    // ***setColorDepth***
+    public void setColorDepth(int colordepth) {
+        this.colordepth = colordepth;
+    }
+
     // ***setPixel***
     public void setPixel(int row, int col, RGBPixel pixel) {
         image[row][col] = pixel;
+    }
+
+
+    // ***setImage***
+    public void setImage(RGBPixel[][] image) {
+        this.image = new RGBPixel[image.length][image[0].length];
+        this.image = image;
     }
     
     // ***grayscale***
@@ -75,7 +91,7 @@ public class RGBImage implements Image {
         RGBImage copyImg = new RGBImage(this);  
   
         image = new RGBPixel[copyImg.getHeight()*2][copyImg.getWidth()*2];
-        
+
         for (int i = 0; i < copyImg.getHeight(); i++) {
             for (int j = 0; j < copyImg.getWidth(); j++) {
                 RGBPixel pixel = copyImg.getPixel(i, j);

@@ -13,9 +13,7 @@ public class RGBPixel {
     }
     
     public RGBPixel(RGBPixel pixel) {
-        red = (byte) (pixel.getRed() - 128);
-        green = (byte ) (pixel.getGreen() - 128);
-        blue = (byte ) (pixel.getBlue() - 128);
+        this(pixel.getRed(), pixel.getGreen(), pixel.getBlue());
     }
     
     // public RGBPixel(YUVPixel pixel) {
