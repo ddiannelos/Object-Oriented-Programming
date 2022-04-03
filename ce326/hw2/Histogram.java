@@ -7,7 +7,7 @@ public class Histogram {
     private short[] histogram;
     private int imgPixels;
 
-    // ******Constructors
+    // ******Constructors******
     public Histogram(YUVImage img) {
         histogram = new short[256];
         imgPixels = img.getWidth()*img.getHeight();

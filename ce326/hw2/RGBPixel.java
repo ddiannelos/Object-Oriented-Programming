@@ -1,15 +1,14 @@
 package ce326.hw2;
 
 public class RGBPixel {
-    private byte red;
-    private byte green;
-    private byte blue;
+    int rgb;
 
     // ******Constructors******
     public RGBPixel(short red, short green, short blue) {
-        this.red = (byte) (red - 128);
-        this.green = (byte) (green - 128);
-        this.blue = (byte) (blue - 128);
+        rgb = 0;
+        rgb |= red << 16;
+        rgb |= green << 8;
+        rgb |= blue;
     }
     
     public RGBPixel(RGBPixel pixel) {
@@ -17,65 +16,78 @@ public class RGBPixel {
     }
     
     public RGBPixel(YUVPixel pixel) {
-        red = (byte) (clip((298*(pixel.getY()-16) + 409*(pixel.getV()-128) + 128)>>8) - 128);
-        green = (byte) (clip((298*(pixel.getY()-16) - 100*(pixel.getU()-128) - 208*(pixel.getV()-128)+128)>>8) - 128);
-        blue = (byte) (clip((298*(pixel.getY()-16) + 516*(pixel.getU()-128) + 128)>>8) - 128);
+        short red = (short) (clip((298*(pixel.getY()-16) + 409*(pixel.getV()-128) + 128)>>8));
+        short green = (short) (clip((298*(pixel.getY()-16) - 100*(pixel.getU()-128) - 208*(pixel.getV()-128)+128)>>8));
+        short blue = (short) (clip((298*(pixel.getY()-16) + 516*(pixel.getU()-128) + 128)>>8));
+        
+        rgb = 0;
+        rgb |= red << 16;
+        rgb |= green << 8;
+        rgb |= blue;
     }
     
     // ******Methods******
     // ***getRed***
     public short getRed() {
-        return (short) (red + 128);
+        return (short) ((rgb >> 16) & 0xff);
     }
     
     // ***getGreen***
     public short getGreen() {
-        return (short) (green + 128);
+        return (short) ((rgb >> 8) & 0xff);
     }
 
     // ***getBlue***
     public short getBlue() {
-        return (short) (blue + 128);
+        return (short) (rgb & 0xff);
     }
 
     // ***setRed***
     void setRed(short red) {
-        this.red = (byte) (red - 128);
+        int newRgb = 0;
+
+        newRgb |= red << 16;
+        newRgb |= getGreen() << 8;
+        newRgb |= getBlue();
+        
+        rgb = newRgb;
     }
 
     // ***setGreen***
     void setGreen(short green) {
-        this.green = (byte) (green - 128);
+        int newRgb = 0;
+
+        newRgb |= getRed() << 16;
+        newRgb |= green << 8;
+        newRgb |= getBlue();
+        
+        rgb = newRgb;
     }
 
     // ***setBlue***
     void setBlue(short blue) {
-        this.blue = (byte) (blue - 128);
+        int newRgb = 0;
+
+        newRgb |= getRed() << 16;
+        newRgb |= getGreen() << 8;
+        newRgb |= blue;
+        
+        rgb = newRgb;
     }
 
     // ***getRGB***
     public int getRGB() {
-        int value = 0;
-
-        value |= red << 16;
-        value |= green << 8;
-        value |= blue;
-
-        return value;
+        return rgb;
     }
 
     // ***setRGB***
     public void setRGB(int value) {
-        blue = (byte) (value & 255);
-        value >>= 8;
-        green = (byte) (value & 255);
-        value >>= 8;
-        red = (byte) (value & 255);
+        rgb = value;
     }
 
     // ***toString***
     public String toString() {        
-        return String.format("%d %d %d", red+128, green + 128, blue + 128);
+        return String.format("%d %d %d", getRed(), getGreen(), getBlue());
     }
 
     // ***clip***

@@ -56,6 +56,7 @@ public class PPMImageStacker {
         
         RGBImage image = new RGBImage(width, height, colordepth);
         short red = 0, green = 0, blue = 0;
+        
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
                 for (int k = 0; k < stackImg.size(); k++) {

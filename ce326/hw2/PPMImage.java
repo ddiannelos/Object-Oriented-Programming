@@ -6,12 +6,7 @@ import java.io.FileWriter;
 import java.io.FileNotFoundException;
 
 public class PPMImage extends RGBImage {  
-    // ******Constructors******
-    public PPMImage(Scanner sc) {
-        super(sc.nextInt(), sc.nextInt(), sc.nextInt());
-
-    }
-    
+    // ******Constructors******  
     public PPMImage(File file) throws FileNotFoundException, 
                                       UnsupportedFileFormatException {
         super(1, 1, 255);

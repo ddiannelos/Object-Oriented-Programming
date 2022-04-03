@@ -144,7 +144,7 @@ public class RGBImage implements Image {
 
         for (int i = 0; i < copyImg.getHeight(); i++) {
             for (int j = 0; j < copyImg.getWidth(); j++) {
-                setPixel(i, j, copyImg.getPixel(j, i));
+                setPixel(j, getWidth()-1-i, copyImg.getPixel(i, j));
             }
         }
     }
