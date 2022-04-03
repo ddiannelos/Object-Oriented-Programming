@@ -54,14 +54,15 @@ public class PPMImage extends RGBImage {
     // ***toString***
     public String toString() {
         String string = "P3\n" + super.getWidth() + 
-                        " " + super.getHeight() + "\n" + 
+                        " " + super.getHeight() + " " + 
                         super.getColorDepth() + "\n";
+
 
         for (int i = 0; i < super.getHeight(); i++) {
             for (int j = 0; j < super.getWidth(); j++) {
-                string.concat(super.getPixel(i, j).getRed() + " " +
-                              super.getPixel(i, j).getGreen() + " " +
-                              super.getPixel(i, j).getBlue() + "\n");
+                string += super.getPixel(i, j).getRed() + " " +
+                          super.getPixel(i, j).getGreen() + " " +
+                          super.getPixel(i, j).getBlue() + "\n";
             }
         }
 

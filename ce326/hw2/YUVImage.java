@@ -105,9 +105,9 @@ public class YUVImage {
 
         for (int i = 0; i < getHeight(); i++) {
             for (int j = 0; j < getWidth(); j++) {
-                string.concat(getPixel(i, j).getY() + " " +
-                              getPixel(i, j).getU() + " " +
-                              getPixel(i, j).getV() + "\n");
+                string += getPixel(i, j).getY() + " " +
+                          getPixel(i, j).getU() + " " +
+                          getPixel(i, j).getV() + "\n";
             }
         }
 
