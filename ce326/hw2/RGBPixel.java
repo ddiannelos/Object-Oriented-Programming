@@ -16,9 +16,11 @@ public class RGBPixel {
         this(pixel.getRed(), pixel.getGreen(), pixel.getBlue());
     }
     
-    // public RGBPixel(YUVPixel pixel) {
-
-    // }
+    public RGBPixel(YUVPixel pixel) {
+        red = (byte) (clip((298*(pixel.getY()-16) + 409*(pixel.getV()-128) + 128)>>8) - 128);
+        green = (byte) (clip((298*(pixel.getY()-16) - 100*(pixel.getU()-128) - 208*(pixel.getV()-128)+128)>>8) - 128);
+        blue = (byte) (clip((298*(pixel.getY()-16) + 516*(pixel.getU()-128) + 128)>>8) - 128);
+    }
     
     // ******Methods******
     // ***getRed***
@@ -74,5 +76,17 @@ public class RGBPixel {
     // ***toString***
     public String toString() {        
         return String.format("%d %d %d", red+128, green + 128, blue + 128);
+    }
+
+    // ***clip***
+    public int clip(int num) {
+        if (num < 0) {
+            return 0;
+        }
+        if (num > 255) {
+            return 255;
+        }
+
+        return num;
     }
 }

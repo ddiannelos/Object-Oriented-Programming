@@ -1,9 +1,9 @@
 package ce326.hw2;
 
-import java.io.FileNotFoundException;
 import java.util.Scanner;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.FileNotFoundException;
 
 public class PPMImage extends RGBImage {  
     // ******Constructors******
@@ -13,7 +13,7 @@ public class PPMImage extends RGBImage {
     }
     
     public PPMImage(File file) throws FileNotFoundException, 
-                                              UnsupportedFileFormatException {
+                                      UnsupportedFileFormatException {
         super(1, 1, 255);
         
         if (file.exists() == false || file.canRead() == false) { 
@@ -27,20 +27,20 @@ public class PPMImage extends RGBImage {
         Scanner sc = new Scanner(file);
         
         sc.next();     
-        RGBPixel[][] image = new RGBPixel[sc.nextInt()][sc.nextInt()];
+        int width = sc.nextInt();
+        int height = sc.nextInt();
+        
+        RGBPixel[][] image = new RGBPixel[height][width];
         
         super.setImage(image);
         super.setColorDepth(sc.nextInt());
     
-        short red, green, blue;
 
-        for (int i = 0; i < image.length; i++) {
-            for (int j = 0; j < image[0].length; j++) {
-                red = sc.nextShort();
-                green = sc.nextShort();
-                blue = sc.nextShort();
-
-                super.setPixel(i, j, new RGBPixel(red, green, blue));
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                super.setPixel(i, j, new RGBPixel(sc.nextShort(), 
+                                                  sc.nextShort(), 
+                                                  sc.nextShort()));
             }
         }
         
@@ -51,9 +51,9 @@ public class PPMImage extends RGBImage {
         super(img);
     }
 
-    // public PPMImage(YUVImage img) {
-
-    // }
+    public PPMImage(YUVImage img) {
+        super(img);
+    }
 
     // ******Methods******
     // ***toString***

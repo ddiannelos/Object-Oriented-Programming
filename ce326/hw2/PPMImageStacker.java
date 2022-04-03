@@ -10,13 +10,14 @@ public class PPMImageStacker {
     private PPMImage img;
     
     // ******Constructors******
-    public PPMImageStacker(File dir) throws FileNotFoundException{
+    public PPMImageStacker(File dir) throws FileNotFoundException, 
+                                            UnsupportedFileFormatException{
         if (dir.exists() == false) {
             throw new FileNotFoundException("[ERROR] Directory " + dir.getName() + 
                                             " does not exist!");
         }
         if (dir.isDirectory() == false) {
-            throw new FileNotFoundException("[ERROR] " + dir.getName() +
+            throw new UnsupportedFileFormatException ("[ERROR] " + dir.getName() +
                                             " is not a directory!");
         }
         
