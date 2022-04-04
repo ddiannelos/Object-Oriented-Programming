@@ -8,7 +8,7 @@ public class RGBImage implements Image {
     
     // ******Constructors******
     public RGBImage() {
-        
+
     }
     
     public RGBImage(int width, int height, int colordepth) {
@@ -21,7 +21,7 @@ public class RGBImage implements Image {
         
         for (int i = 0; i < getHeight(); i++) {
             for (int j = 0; j < getWidth(); j++) {               
-                setPixel(i, j, copyImg.getPixel(i, j));
+                image[i][j] = new RGBPixel(copyImg.getPixel(i, j));
             }
         }
     }
