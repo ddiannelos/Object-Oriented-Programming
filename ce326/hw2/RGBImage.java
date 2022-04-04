@@ -7,9 +7,6 @@ public class RGBImage implements Image {
     private int colordepth;
     
     // ******Constructors******
-    public RGBImage() {
-    }
-    
     public RGBImage(int width, int height, int colordepth) {
         image = new RGBPixel[height][width];
         this.colordepth = colordepth;
@@ -26,7 +23,7 @@ public class RGBImage implements Image {
     }
     
     public RGBImage(YUVImage YUVImage) {
-        this(YUVImage.getWidth(), YUVImage.getHeight(), 255);
+        this(YUVImage.getWidth(), YUVImage.getHeight(), MAX_COLORDEPTH);
 
         for (int i = 0; i < getHeight(); i++) {
             for (int j = 0; j < getWidth(); j++) {

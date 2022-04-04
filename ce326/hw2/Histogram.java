@@ -9,10 +9,10 @@ public class Histogram {
 
     // ******Constructors******
     public Histogram(YUVImage img) {
-        histogram = new short[256];
+        histogram = new short[236];
         imgPixels = img.getWidth()*img.getHeight();
 
-        for (int i = 0; i < 256; i++) {
+        for (int i = 0; i < 236; i++) {
             histogram[i] = 0;
         }
 
@@ -28,35 +28,35 @@ public class Histogram {
     public String toString() {
         String string = "";
 
-        for (int i = 0; i < 256; i++) {            
-            string.concat(String.format("\n %3d. (%4d)  ", 
-                                        i, histogram[i]));
+        for (int i = 0; i < 236; i++) {            
+            string += String.format("\n %3d. (%4d)  ", 
+                                        i, histogram[i]);
             
             int j, num = histogram[i];
             
             for (j = 0; j < num/1000; j++) {
-                string.concat("#");
+                string += "#";
             }
             num -= j*1000;
             
             for (j = 0; j < num/100; j++) {
-                string.concat("$");
+                string += "$";
             }
             num -= j*100;
             
             for (j = 0; j < num/10; j++) {
-                string.concat("@");
+                string += "@";
             }
             num -= j*10;
             
             for (j = 0; j < histogram[i]; j++) {
-                string.concat("*");
+                string += "*";
             }
 
-            string.concat("\n");
+            string += "\n";
         }
         
-        string.concat("\n");
+        string += "\n";
 
         return string;
     }
@@ -79,20 +79,20 @@ public class Histogram {
 
     // ***equalize***
     public void equalize() {
-        float[] probability = new float[256];
+        float[] probability = new float[236];
 
-        for (int i = 0; i < 256; i++) {
+        for (int i = 0; i < 236; i++) {
             probability[i] = (float) (histogram[i]) / (float) (imgPixels);
         }
 
-        float[] sumProbability = new float[256];
+        float[] sumProbability = new float[236];
         sumProbability[0] = probability[0];
 
-        for (int i = 1; i < 256; i++) {
+        for (int i = 1; i < 236; i++) {
             sumProbability[i] = probability[i] + sumProbability[i-1];
         }
         
-        for (int i = 0; i < 256; i++) {
+        for (int i = 0; i < 236; i++) {
             histogram[i] = (short) (sumProbability[i]*235);
             if (histogram[i] > 235) {
                 histogram[i] = 235;

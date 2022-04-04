@@ -16,9 +16,13 @@ public class RGBPixel {
     }
     
     public RGBPixel(YUVPixel pixel) {
-        short red = (short) (clip((298*(pixel.getY()-16) + 409*(pixel.getV()-128) + 128)>>8));
-        short green = (short) (clip((298*(pixel.getY()-16) - 100*(pixel.getU()-128) - 208*(pixel.getV()-128)+128)>>8));
-        short blue = (short) (clip((298*(pixel.getY()-16) + 516*(pixel.getU()-128) + 128)>>8));
+        short C = (short) (pixel.getY() - 16);
+        short D = (short) (pixel.getU() - 128);
+        short E = (short) (pixel.getV() - 128);
+
+        short red =  clip((short) ((298*C + 409*E + 128) >> 8));
+        short green = clip((short) ((298*C - 100*D - 208*E + 128) >> 8));
+        short blue =  clip((short) ((298*C + 516*D + 128) >> 8));
         
         rgb = 0;
         rgb |= red << 16;
@@ -91,7 +95,7 @@ public class RGBPixel {
     }
 
     // ***clip***
-    public int clip(int num) {
+    public short clip(short num) {
         if (num < 0) {
             return 0;
         }
