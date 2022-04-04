@@ -17,7 +17,7 @@ public class PPMImageStacker {
                                             " does not exist!");
         }
         if (dir.isDirectory() == false) {
-            throw new UnsupportedFileFormatException ("[ERROR] " + dir.getName() +
+            throw new FileNotFoundException ("[ERROR] " + dir.getName() +
                                             " is not a directory!");
         }
         
@@ -29,10 +29,10 @@ public class PPMImageStacker {
                 stackImg.add(image);
             }
             catch(FileNotFoundException e) {
-                System.out.println("FileNotFoundException");
+                throw new FileNotFoundException();
             }
             catch(UnsupportedFileFormatException e) {
-                System.out.println("UnsupportedFileFormatException");
+               throw new UnsupportedFileFormatException();
             }
         }
     }

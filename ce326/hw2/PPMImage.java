@@ -9,7 +9,7 @@ public class PPMImage extends RGBImage {
     // ******Constructors******  
     public PPMImage(File file) throws FileNotFoundException, 
                                       UnsupportedFileFormatException {
-        super(1, 1, 255);
+        super();
         
         if (file.exists() == false || file.canRead() == false) { 
             throw new FileNotFoundException();
@@ -30,7 +30,6 @@ public class PPMImage extends RGBImage {
         super.setImage(image);
         super.setColorDepth(sc.nextInt());
     
-
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
                 super.setPixel(i, j, new RGBPixel(sc.nextShort(), 
@@ -56,7 +55,6 @@ public class PPMImage extends RGBImage {
         String string = "P3\n" + super.getWidth() + 
                         " " + super.getHeight() + " " + 
                         super.getColorDepth() + "\n";
-
 
         for (int i = 0; i < super.getHeight(); i++) {
             for (int j = 0; j < super.getWidth(); j++) {

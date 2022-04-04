@@ -29,7 +29,7 @@ public class Histogram {
         String string = "";
 
         for (int i = 0; i < 236; i++) {            
-            string += String.format("\n %3d. (%4d)  ", 
+            string += String.format("\n%3d.(%4d)  ", 
                                         i, histogram[i]);
             
             int j, num = histogram[i];

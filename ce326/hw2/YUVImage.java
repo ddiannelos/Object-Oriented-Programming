@@ -23,14 +23,13 @@ public class YUVImage {
         this(copyImg.getWidth(), copyImg.getHeight());
         for (int i = 0; i < getHeight(); i++) {
             for (int j = 0; j < getWidth(); j++) {
-                setPixel(i, j, copyImg.getPixel(i, j));
+                image[i][j] = new YUVPixel(copyImg.getPixel(i,j));
             }
         }
     }
     
     public YUVImage(RGBImage RGBImg) {
         this(RGBImg.getWidth(), RGBImg.getHeight());
-
         for (int i = 0; i < getHeight(); i++) {
             for (int j = 0; j < getWidth(); j++) {
                 image[i][j] = new YUVPixel(RGBImg.getPixel(i, j));

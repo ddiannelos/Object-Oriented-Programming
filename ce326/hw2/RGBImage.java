@@ -7,6 +7,10 @@ public class RGBImage implements Image {
     private int colordepth;
     
     // ******Constructors******
+    public RGBImage() {
+        
+    }
+    
     public RGBImage(int width, int height, int colordepth) {
         image = new RGBPixel[height][width];
         this.colordepth = colordepth;
