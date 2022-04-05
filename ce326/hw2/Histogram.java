@@ -52,8 +52,6 @@ public class Histogram {
             for (j = 0; j < histogram[i]; j++) {
                 string += "*";
             }
-
-            string += "\n";
         }
         
         string += "\n";
