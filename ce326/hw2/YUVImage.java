@@ -14,7 +14,7 @@ public class YUVImage {
         
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
-                image[i][j] = new YUVPixel((short)16, (short)128, (short)128);
+                setPixel(i, j, new YUVPixel((short)16, (short)128, (short)128));
             }
         }
     }
@@ -23,7 +23,7 @@ public class YUVImage {
         this(copyImg.getWidth(), copyImg.getHeight());
         for (int i = 0; i < getHeight(); i++) {
             for (int j = 0; j < getWidth(); j++) {
-                image[i][j] = new YUVPixel(copyImg.getPixel(i,j));
+                setPixel(i, j, copyImg.getPixel(i, j));
             }
         }
     }
@@ -32,7 +32,7 @@ public class YUVImage {
         this(RGBImg.getWidth(), RGBImg.getHeight());
         for (int i = 0; i < getHeight(); i++) {
             for (int j = 0; j < getWidth(); j++) {
-                image[i][j] = new YUVPixel(RGBImg.getPixel(i, j));
+                setPixel(i, j, new YUVPixel(RGBImg.getPixel(i, j)));
             }
         }
     }
@@ -139,6 +139,5 @@ public class YUVImage {
                 getPixel(i, j).setY(histogram.getEqualizedLuminocity(getPixel(i, j).getY()));
             }
         }
-
     }
 }

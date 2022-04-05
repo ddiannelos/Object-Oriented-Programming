@@ -25,8 +25,10 @@ public class PPMImageStacker {
 
         for (File temp : dir.listFiles()) {
             try {
-                PPMImage image = new PPMImage(temp);
-                stackImg.add(image);
+                if (!temp.getName().startsWith(".")) {
+                    PPMImage image = new PPMImage(temp);
+                    stackImg.add(image);                    
+                }
             }
             catch(FileNotFoundException e) {
                 throw new FileNotFoundException();
