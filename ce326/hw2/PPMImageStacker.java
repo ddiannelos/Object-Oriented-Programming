@@ -82,7 +82,6 @@ public class PPMImageStacker {
 
     // ***getStackedImage***
     public PPMImage getStackedImage() {
-        stack();
         return img;
     }
 }
