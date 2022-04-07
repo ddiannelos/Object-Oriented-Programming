@@ -49,7 +49,7 @@ public class Histogram {
             }
             num -= j*10;
             
-            for (j = 0; j < histogram[i]; j++) {
+            for (j = 0; j < num; j++) {
                 string += "*";
             }
         }

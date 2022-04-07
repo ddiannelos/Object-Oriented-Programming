@@ -69,11 +69,7 @@ public class PPMImage extends RGBImage {
 
     // ***toFile***
     public void toFile(File file) {        
-        try {
-            if (file.exists() == false) {
-                file.createNewFile();
-            }
-            
+        try {            
             FileWriter writer = new FileWriter(file.getName(), false);
 
             writer.write(toString());

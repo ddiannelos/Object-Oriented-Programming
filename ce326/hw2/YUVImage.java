@@ -116,10 +116,6 @@ public class YUVImage {
     // ***toFile***
     public void toFile(File file) {        
         try {
-            if (file.exists() == false) {
-                file.createNewFile();
-            }
-
             FileWriter writer = new FileWriter(file.getName(), false);
 
             writer.write(toString());
