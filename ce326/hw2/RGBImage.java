@@ -119,15 +119,15 @@ public class RGBImage implements Image {
             for (int j = 0; j < getWidth(); j++) {
                 short red = (short) ((copyImg.getPixel(2*i, 2*j).getRed() + 
                             copyImg.getPixel((2*i)+1, 2*j).getRed() + 
-                            copyImg.getPixel(i, (2*j)+1).getRed() + 
+                            copyImg.getPixel(2*i, (2*j)+1).getRed() + 
                             copyImg.getPixel((2*i)+1, (2*j)+1).getRed())/4);
                 short green = (short) ((copyImg.getPixel(2*i, 2*j).getGreen() + 
                             copyImg.getPixel((2*i)+1, 2*j).getGreen() + 
-                            copyImg.getPixel(i, (2*j)+1).getGreen() + 
+                            copyImg.getPixel(2*i, (2*j)+1).getGreen() + 
                             copyImg.getPixel((2*i)+1, (2*j)+1).getGreen())/4);;
                 short blue = (short) ((copyImg.getPixel(2*i, 2*j).getBlue() + 
                             copyImg.getPixel((2*i)+1, 2*j).getBlue() + 
-                            copyImg.getPixel(i, (2*j)+1).getBlue() + 
+                            copyImg.getPixel(2*i, (2*j)+1).getBlue() + 
                             copyImg.getPixel((2*i)+1, (2*j)+1).getBlue())/4);;
                 RGBPixel pixel = new RGBPixel(red, green, blue);
                 
