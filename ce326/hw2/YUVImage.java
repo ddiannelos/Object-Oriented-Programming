@@ -116,7 +116,7 @@ public class YUVImage {
     // ***toFile***
     public void toFile(File file) {        
         try {
-            FileWriter writer = new FileWriter(file.getName(), false);
+            FileWriter writer = new FileWriter(file);
 
             writer.write(toString());
             writer.close();
