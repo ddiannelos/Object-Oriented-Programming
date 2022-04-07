@@ -1,7 +1,7 @@
 package ce326.hw2;
 
 public class RGBPixel {
-    int rgb;
+    private int rgb;
 
     // ******Constructors******
     public RGBPixel(short red, short green, short blue) {
