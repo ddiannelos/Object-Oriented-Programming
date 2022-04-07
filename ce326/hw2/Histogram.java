@@ -77,24 +77,16 @@ public class Histogram {
 
     // ***equalize***
     public void equalize() {
-        float[] probability = new float[236];
-
-        for (int i = 0; i < 236; i++) {
-            probability[i] = (float) (histogram[i]) / (float) (imgPixels);
-        }
-
-        float[] sumProbability = new float[236];
-        sumProbability[0] = probability[0];
+        short[] probability = new short[236];
+        
+        probability[0] = histogram[0];
 
         for (int i = 1; i < 236; i++) {
-            sumProbability[i] = probability[i] + sumProbability[i-1];
+            probability[i] = (short) (histogram[i] + probability[i-1]);
         }
         
         for (int i = 0; i < 236; i++) {
-            histogram[i] = (short) (sumProbability[i]*235);
-            if (histogram[i] > 235) {
-                histogram[i] = 235;
-            }
+            histogram[i] = (short) ((probability[i]*235) / imgPixels);
         }
     }
 
