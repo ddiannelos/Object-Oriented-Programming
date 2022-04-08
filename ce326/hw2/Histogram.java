@@ -65,6 +65,7 @@ public class Histogram {
             FileWriter writer = new FileWriter(file, false);
 
             writer.write(toString());
+            writer.flush();
             writer.close();
         }
         catch (Exception e) {
