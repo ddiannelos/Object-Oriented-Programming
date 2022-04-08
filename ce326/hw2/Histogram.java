@@ -62,10 +62,7 @@ public class Histogram {
     // ***toFile***
     public void toFile(File file) {
         try {
-            file.delete();
-            file.createNewFile();
-
-            FileWriter writer = new FileWriter(file.getName());
+            FileWriter writer = new FileWriter(file, false);
 
             writer.write(toString());
             writer.close();
