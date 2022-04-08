@@ -98,19 +98,22 @@ public class YUVImage {
     }
 
     // ***toString***
+    @Override
     public String toString() {
-        String string = "YUV3\n" + getWidth() + 
-                        " " + getHeight() + "\n";
+        StringBuilder string = new StringBuilder();
+
+        string.append("YUV3\n").append(getWidth()).append(" ").
+                                append(getHeight()).append("\n");
 
         for (int i = 0; i < getHeight(); i++) {
             for (int j = 0; j < getWidth(); j++) {
-                string += getPixel(i, j).getY() + " " +
-                          getPixel(i, j).getU() + " " +
-                          getPixel(i, j).getV() + "\n";
+                string.append(getPixel(i, j).getY()).append(" ").
+                       append(getPixel(i, j).getU()).append(" "). 
+                       append(getPixel(i, j).getV()).append("\n");
             }
         }
 
-        return string;
+        return string.toString();
     }
     
     // ***toFile***
@@ -119,7 +122,6 @@ public class YUVImage {
             FileWriter writer = new FileWriter(file);
 
             writer.write(toString());
-            writer.flush();
             writer.close();
         }
         catch (Exception e) {

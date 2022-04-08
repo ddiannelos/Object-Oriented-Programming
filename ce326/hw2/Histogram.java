@@ -12,6 +12,7 @@ public class Histogram {
         histogram = new short[236];
         imgPixels = img.getWidth()*img.getHeight();
 
+        // Initialize histogram
         for (int i = 0; i < 236; i++) {
             histogram[i] = 0;
         }
@@ -25,38 +26,38 @@ public class Histogram {
 
     // ******Methods******
     // ***toString***
+    @Override
     public String toString() {
-        String string = "";
+        StringBuilder string = new StringBuilder();
 
         for (int i = 0; i < 236; i++) {            
-            string += String.format("\n%3d.(%4d)\t", 
-                                        i, histogram[i]);
+            string.append(String.format("\n%3d.(%4d)\t", i, histogram[i]));
             
             int j, num = histogram[i];
             
             for (j = 0; j < num/1000; j++) {
-                string += "#";
+                string.append("#");
             }
             num -= j*1000;
             
             for (j = 0; j < num/100; j++) {
-                string += "$";
+                string.append("$");
             }
             num -= j*100;
             
             for (j = 0; j < num/10; j++) {
-                string += "@";
+                string.append("@");
             }
             num -= j*10;
             
             for (j = 0; j < num; j++) {
-                string += "*";
+                string.append("*");
             }
         }
         
-        string += "\n";
+        string.append("\n");
 
-        return string;
+        return string.toString();
     }
 
     // ***toFile***
@@ -65,7 +66,6 @@ public class Histogram {
             FileWriter writer = new FileWriter(file);
 
             writer.write(toString());
-            writer.flush();
             writer.close();
         }
         catch (Exception e) {

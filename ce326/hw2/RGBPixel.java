@@ -90,6 +90,7 @@ public class RGBPixel {
     }
 
     // ***toString***
+    @Override
     public String toString() {        
         return String.format("%d %d %d", getRed(), getGreen(), getBlue());
     }

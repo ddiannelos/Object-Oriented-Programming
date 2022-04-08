@@ -51,20 +51,23 @@ public class PPMImage extends RGBImage {
 
     // ******Methods******
     // ***toString***
+    @Override
     public String toString() {
-        String string = "P3\n" + super.getWidth() + 
-                        " " + super.getHeight() + " " + 
-                        super.getColorDepth() + "\n";
+        StringBuilder string = new StringBuilder();
+
+        string.append("P3\n").append(super.getWidth()).append(" ").
+                              append(super.getHeight()).append(" ").
+                              append(super.getColorDepth()).append("\n");
 
         for (int i = 0; i < super.getHeight(); i++) {
             for (int j = 0; j < super.getWidth(); j++) {
-                string += super.getPixel(i, j).getRed() + " " +
-                          super.getPixel(i, j).getGreen() + " " +
-                          super.getPixel(i, j).getBlue() + "\n";
+                string.append(getPixel(i, j).getRed()).append(" ").
+                       append(getPixel(i, j).getGreen()).append(" ").
+                       append(getPixel(i, j).getBlue()).append("\n");
             }
         }
-
-        return string;
+        
+        return string.toString();
     }
 
     // ***toFile***
@@ -72,8 +75,7 @@ public class PPMImage extends RGBImage {
         try {            
             FileWriter writer = new FileWriter(file);
 
-            writer.write(toString());
-            writer.flush();
+            writer.write(this.toString());
             writer.close();
         }
         catch (Exception e) {
