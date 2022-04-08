@@ -115,14 +115,20 @@ public class YUVImage {
     
     // ***toFile***
     public void toFile(File file) {        
-        if (file.exists()) {
-            file.delete();
-        }
         try {
-            FileWriter writer = new FileWriter(file, false);
+            if (file.exists()) {
+                FileWriter writer = new FileWriter(file, false);
+            
+                writer.write(toString());
+                writer.close();
+            }
+            else {
+                file.createNewFile();
+                FileWriter writer = new FileWriter(file);
 
-            writer.write(toString());
-            writer.close();
+                writer.write(toString());
+                writer.close();
+            }
         }
         catch (Exception e) {
             System.out.println("FileWriter exception");
