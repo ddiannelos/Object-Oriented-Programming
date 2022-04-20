@@ -26,7 +26,8 @@ public class Homework3 {
     private JCheckBox checkBox;
     private Boolean[][] initializedButtons = new Boolean[9][9];
     private Color yellowRGB = new Color(255,255,200);
-    private JButton chosenSudokuButton;
+    private JButton idleButton = new JButton();
+    private JButton chosenSudokuButton = idleButton;
     
     public Homework3() {
         // Create frame
@@ -113,13 +114,24 @@ public class Homework3 {
         for (int i = 0; i < numButtons.length; i++) {
             numButtons[i] = new JButton(String.valueOf(i+1));
             numButtons[i].setFocusable(false);
-            numButtons[i].addActionListener(numberButtonsListener);
+            numButtons[i].getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).
+                          put(KeyStroke.getKeyStroke(String.valueOf(i+1)), 
+                                                     String.valueOf(i+1));
+            numButtons[i].getActionMap().
+                          put(String.valueOf(i+1), numberButtonsAction);
+            numButtons[i].addActionListener(numberButtonsAction);
             bottomPanel.add(numButtons[i]);
         }
         
         removeButton = new JButton("remove");
         // need icon
         removeButton.setFocusable(false);
+        removeButton.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).
+                     put(KeyStroke.getKeyStroke("BACK_SPACE"), "remove");
+        removeButton.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).
+                     put(KeyStroke.getKeyStroke("DELETE"), "remove");
+        removeButton.getActionMap().put("remove", optionButtonsAction);
+        removeButton.addActionListener(optionButtonsAction);
         bottomPanel.add(removeButton);
         
         undoButton = new JButton("undo");
@@ -210,7 +222,6 @@ public class Homework3 {
                     }
                     else {
                         sudokuButtons[i][j].setBackground(Color.WHITE);
-
                     }
                     
                     if (e.getSource() == sudokuButtons[i][j]) {
@@ -225,60 +236,118 @@ public class Homework3 {
             }
 
             if (number != 0) {
-                for (int i = 0; i < sudokuButtons.length; i++) {
-                    for (int j = 0; j < sudokuButtons[i].length; j++) {
-                        String string = sudokuButtons[i][j].getText();
-                        if (string != "" && number == Integer.valueOf(string)) {
-                            sudokuButtons[i][j].setBackground(yellowRGB);
-                        }
-                    }
-                }
+                repaintSudokuGrid(number);
             }
 
         }
     };
 
-    // Action Listener for the numberButtons
-    ActionListener numberButtonsListener = new ActionListener() {
+    // Action for the numberButtons
+    Action numberButtonsAction = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
+            if (chosenSudokuButton.equals(idleButton)) {
+                return;
+            }
+            
             int number = 0;
 
-            for (int i = 0; i < numButtons.length; i++) {
-                if (e.getSource() == numButtons[i]) {
-                    for (int j = 0; j < sudokuButtons.length; j++) {
-                        for (int k = 0; k < sudokuButtons[j].length; k++) {
-                            if (chosenSudokuButton.equals(sudokuButtons[j][k])) {
-                                if (initializedButtons[j][k] == false) {
-                                    number = i+1;
-                                    chosenSudokuButton.setText(String.valueOf(number));
+            loop: {
+                for (int i = 0; i < numButtons.length; i++) {
+                    if (e.getSource() == numButtons[i]) {
+                        for (int j = 0; j < sudokuButtons.length; j++) {
+                            for (int k = 0; k < sudokuButtons[j].length; k++) {
+                                if (chosenSudokuButton.equals(sudokuButtons[j][k])) {
+                                    if (initializedButtons[j][k] == false) {
+                                        number = i+1;
+                                        if (checkCollisions(number) == false) return;
+                                        chosenSudokuButton.setText(String.valueOf(number));
+                            
+                                        break loop;
+                                    }
                                 }
                             }
-                        }
-                    }          
+                        }          
+                    }
                 }
             }
 
             if (number != 0) {
-                for (int i = 0; i < sudokuButtons.length; i++) {
-                    for (int j = 0; j < sudokuButtons[i].length; j++) {
-                        String string = sudokuButtons[i][j].getText();
-                        if (string != "" && number == Integer.valueOf(string)) {
-                            sudokuButtons[i][j].setBackground(yellowRGB);
-                        }
-                        else if (string != "" && initializedButtons[i][j]) {
-                            sudokuButtons[i][j].setBackground(Color.GRAY);
-                        }
-                        else {
-                            sudokuButtons[i][j].setBackground(Color.WHITE);
-                        }
-                    }
-                }
+                repaintSudokuGrid(number);
             }
             
         }
     };
 
+    Action optionButtonsAction = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (chosenSudokuButton.equals(idleButton)) {
+                return;
+            }
+            
+            loop : {
+                if (e.getSource() == removeButton) {
+                    for (int i = 0; i < sudokuButtons.length; i++) {
+                        for (int j = 0; j < sudokuButtons[i].length; j++) {
+                            if (chosenSudokuButton.equals(sudokuButtons[i][j])) {
+                                if (initializedButtons[i][j]) {
+                                    return;
+                                }
+                                else {
+                                    chosenSudokuButton.setText("");
+                                    chosenSudokuButton = idleButton;
+                                    break loop;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            repaintSudokuGrid(0);
+        }
+    };
+
+    void repaintSudokuGrid(int number) {
+        for (int i = 0; i < sudokuButtons.length; i++) {
+            for (int j = 0; j < sudokuButtons[i].length; j++) {
+                String string = sudokuButtons[i][j].getText();
+                if (string != "" && number == Integer.valueOf(string)) {
+                    sudokuButtons[i][j].setBackground(yellowRGB);
+                }
+                else if (string != "" && initializedButtons[i][j]) {
+                    sudokuButtons[i][j].setBackground(Color.GRAY);
+                }
+                else {
+                    sudokuButtons[i][j].setBackground(Color.WHITE);
+                }
+            }
+        }
+    }
+
+    boolean checkCollisions(int number) {
+        int i = 0, j = 0, success = 0;
+        System.out.println(number);
+        loop: {
+            for (i = 0; i < sudokuButtons.length; i++) {
+                for (j = 0; j < sudokuButtons[i].length; j++) {
+                    if (chosenSudokuButton.equals(sudokuButtons[i][j])) {
+                        break loop;
+                    }
+                }
+            }
+        }
+
+        for (int k = 0; k < sudokuButtons[i].length; k++) {
+            if (sudokuButtons[i][k].getText() == String.valueOf(number)) {
+                sudokuButtons[i][k].setBackground(Color.RED);
+                success++;
+            }
+        }
+        
+        return (success > 0) ? false : true;
+    }
     public static void main(String[] args) {
         new Homework3();
     }
