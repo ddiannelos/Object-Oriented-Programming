@@ -250,6 +250,8 @@ public class Homework3 {
                 return;
             }
             
+            repaintSudokuGrid(0);
+
             int number = 0;
 
             loop: {
@@ -260,9 +262,12 @@ public class Homework3 {
                                 if (chosenSudokuButton.equals(sudokuButtons[j][k])) {
                                     if (initializedButtons[j][k] == false) {
                                         number = i+1;
-                                        if (checkCollisions(number) == false) return;
+                                        if (checkCollisions(number) == false) {
+                                            chosenSudokuButton.setBackground(yellowRGB);
+                                            return;
+                                        }
                                         chosenSudokuButton.setText(String.valueOf(number));
-                            
+                                        chosenSudokuButton = idleButton;
                                         break loop;
                                     }
                                 }
@@ -270,12 +275,7 @@ public class Homework3 {
                         }          
                     }
                 }
-            }
-
-            if (number != 0) {
-                repaintSudokuGrid(number);
-            }
-            
+            }  
         }
     };
 
@@ -286,7 +286,7 @@ public class Homework3 {
             if (chosenSudokuButton.equals(idleButton)) {
                 return;
             }
-            
+
             loop : {
                 if (e.getSource() == removeButton) {
                     for (int i = 0; i < sudokuButtons.length; i++) {
@@ -399,6 +399,7 @@ public class Homework3 {
         
         return (success > 0) ? false : true;
     }
+
     public static void main(String[] args) {
         new Homework3();
     }
