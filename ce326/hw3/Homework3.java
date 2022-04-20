@@ -9,6 +9,8 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.List;
+import java.util.ArrayList;
 import java.awt.*;
 
 
@@ -28,6 +30,9 @@ public class Homework3 {
     private Color yellowRGB = new Color(255,255,200);
     private JButton idleButton = new JButton();
     private JButton chosenSudokuButton = idleButton;
+    private List<JButton> addingNumberSequence = new ArrayList<>();
+    private int[][] solvedSudoku = new int[9][9];
+    private boolean gameOn = false;
     
     public Homework3() {
         // Create frame
@@ -137,6 +142,7 @@ public class Homework3 {
         undoButton = new JButton("undo");
         //need icon
         undoButton.setFocusable(false);
+        undoButton.addActionListener(optionButtonsAction);
         bottomPanel.add(undoButton);
         
         checkBox = new JCheckBox();
@@ -148,6 +154,7 @@ public class Homework3 {
         solveButton = new JButton("solve");
         // need icon
         solveButton.setFocusable(false);
+        solveButton.addActionListener(optionButtonsAction);
         bottomPanel.add(solveButton);
 
         // Add Components to the frame
@@ -188,15 +195,20 @@ public class Homework3 {
                         if (sudokuNumber != '.') {
                             sudokuButtons[i][j].setText(String.valueOf(sudokuNumber));
                             sudokuButtons[i][j].setBackground(Color.GRAY);
+                            solvedSudoku[i][j] = Character.getNumericValue(sudokuNumber);
                             initializedButtons[i][j] = true;
                         }
                         else {
                             sudokuButtons[i][j].setText("");
                             sudokuButtons[i][j].setBackground(Color.WHITE);
+                            solvedSudoku[i][j] = 0;
                             initializedButtons[i][j] = false;
                         }
                     }
                 } 
+                
+                gameOn = solveSudoku();
+                setEnabledBottomPanelButtons(true);
             }
             catch (MalformedURLException exception) {
                 System.err.println(exception);
@@ -267,6 +279,7 @@ public class Homework3 {
                                             return;
                                         }
                                         chosenSudokuButton.setText(String.valueOf(number));
+                                        addingNumberSequence.add(sudokuButtons[j][k]);
                                         chosenSudokuButton = idleButton;
                                         break loop;
                                     }
@@ -283,12 +296,12 @@ public class Homework3 {
     Action optionButtonsAction = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (chosenSudokuButton.equals(idleButton)) {
-                return;
-            }
-
             loop : {
                 if (e.getSource() == removeButton) {
+                    if (chosenSudokuButton.equals(idleButton)) {
+                        return;
+                    }
+                    
                     for (int i = 0; i < sudokuButtons.length; i++) {
                         for (int j = 0; j < sudokuButtons[i].length; j++) {
                             if (chosenSudokuButton.equals(sudokuButtons[i][j])) {
@@ -298,11 +311,45 @@ public class Homework3 {
                                 else {
                                     chosenSudokuButton.setText("");
                                     chosenSudokuButton = idleButton;
+                                    for (int k = 0; k < addingNumberSequence.size(); k++) {
+                                        if (chosenSudokuButton.equals(addingNumberSequence.get(k))) {
+                                            addingNumberSequence.remove(i);
+                                        }
+                                    }
+                                    
                                     break loop;
                                 }
                             }
                         }
                     }
+                }
+                else if (e.getSource() == undoButton) {
+                    if (addingNumberSequence.size() == 0) {
+                        return;
+                    }
+                    addingNumberSequence.get(addingNumberSequence.size()-1).setText("");
+                    addingNumberSequence.remove(addingNumberSequence.size()-1);
+                    chosenSudokuButton = idleButton;
+
+                    return;
+                }
+                else if (e.getSource() == solveButton) {
+                    if (gameOn == false) {
+                        return;
+                    }
+
+                    for (int i = 0; i < sudokuButtons.length; i++) {
+                        for (int j = 0; j < sudokuButtons[i].length; j++) {
+                            if (initializedButtons[i][j] == true) {
+                                continue;
+                            }
+                            sudokuButtons[i][j].setText(String.valueOf(solvedSudoku[i][j]));
+                        }
+                    }
+                    setEnabledBottomPanelButtons(false);
+                    
+                    chosenSudokuButton = idleButton;
+                    gameOn = false;
                 }
             }
 
@@ -310,6 +357,19 @@ public class Homework3 {
         }
     };
 
+    // ***setEnabledBottomPanelButtons
+    // Method that enables the ButtopPanel
+    // buttons
+    void setEnabledBottomPanelButtons(boolean bool) {
+        for (JButton button : numButtons) {
+            button.setEnabled(bool);
+        }
+        removeButton.setEnabled(bool);
+        undoButton.setEnabled(bool);
+        checkBox.setEnabled(bool);
+        solveButton.setEnabled(bool);
+    }
+    
     // ***repaintSudokuGrid***
     // Method to reapaint sudoku grid depending on
     // the number given as parameter
@@ -345,7 +405,7 @@ public class Homework3 {
             }
         }
         
-        // Find collisions to the same row
+        // Find collisions on the same row
         for (int k = 0; k < sudokuButtons[i].length; k++) {
             if (chosenSudokuButton.equals(sudokuButtons[i][k])) {
                 continue;
@@ -357,8 +417,8 @@ public class Homework3 {
             }
         }
         
-        // Find collisions to the same collumn
-        for (int k = 0; k < sudokuButtons[i].length; k++) {
+        // Find collisions on the same collumn
+        for (int k = 0; k < sudokuButtons.length; k++) {
             if (chosenSudokuButton.equals(sudokuButtons[k][j])) {
                 continue;
             }
@@ -369,7 +429,7 @@ public class Homework3 {
             }
         }
 
-        // Find collisions to the same block
+        // Find collisions on the same block
         int panelStartingPositionX = i, panelStartingPositionY = j;
         
         while (panelStartingPositionX%3 != 0 || panelStartingPositionY%3 != 0) {
@@ -398,6 +458,85 @@ public class Homework3 {
         }
         
         return (success > 0) ? false : true;
+    }
+
+    // ***checkCollisions***
+    // Method that checks collision on the 
+    // solvedSudoku array depending on the number
+    boolean checkCollisions(int row, int col, int number) {
+        // Check collisions on the same row
+        for (int i = 0; i < solvedSudoku[row].length; i++) {
+            if (i == col) {
+                continue;
+            }
+            
+            if (solvedSudoku[row][i] == number) {
+                return false;
+            }
+        }
+
+        // Check collisions on the same column
+        for (int i = 0; i < solvedSudoku.length; i++) {
+            if (i == row) {
+                continue;
+            }
+
+            if (solvedSudoku[i][col] == number) {
+                return false;
+            }
+        }
+        
+        // Check collisions on the same block
+        int panelStartingPositionX = row, panelStartingPositionY = col;
+
+        while (panelStartingPositionX%3 != 0 || panelStartingPositionY%3 != 0) {
+            if (panelStartingPositionX%3 != 0) {
+                panelStartingPositionX--;
+            }
+            if (panelStartingPositionY%3 != 0) {
+                panelStartingPositionY--;
+            }
+        } 
+
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                int x = i + panelStartingPositionX;
+                int y = j + panelStartingPositionY;
+                
+                if (x == row && y == col) {
+                    continue;
+                }
+                
+                if (solvedSudoku[x][y] == number) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+    
+    // ***sudokuSolver***
+    // Method that solves the sudoku and
+    // save the solved sodoku to a two
+    // dimensional array
+    boolean solveSudoku() {
+        for (int i = 0; i < solvedSudoku.length; i++) {
+            for (int j = 0; j < solvedSudoku[i].length; j++) {
+                if (solvedSudoku[i][j] == 0) {
+                    for (int k = 1; k <= 9; k++) {
+                        solvedSudoku[i][j] = k;
+                        if (checkCollisions(i, j, k) && solveSudoku()) {
+                            return true;
+                        }
+                        solvedSudoku[i][j] = 0;
+                    }
+
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     public static void main(String[] args) {
