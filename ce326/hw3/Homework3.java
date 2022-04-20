@@ -27,6 +27,7 @@ public class Homework3 {
     private JButton removeButton, undoButton, solveButton;
     private JCheckBox checkBox;
     private Boolean[][] initializedButtons = new Boolean[9][9];
+    private int initializedButtonsNumber = 0;
     private Color yellowRGB = new Color(255,255,200);
     private JButton idleButton = new JButton();
     private JButton chosenSudokuButton = idleButton;
@@ -197,6 +198,7 @@ public class Homework3 {
                             sudokuButtons[i][j].setBackground(Color.GRAY);
                             solvedSudoku[i][j] = Character.getNumericValue(sudokuNumber);
                             initializedButtons[i][j] = true;
+                            initializedButtonsNumber++;
                         }
                         else {
                             sudokuButtons[i][j].setText("");
@@ -280,6 +282,14 @@ public class Homework3 {
                                         }
                                         chosenSudokuButton.setText(String.valueOf(number));
                                         addingNumberSequence.add(sudokuButtons[j][k]);
+                                        
+                                        if (addingNumberSequence.size()+initializedButtonsNumber == 
+                                                                        sudokuButtons.length*sudokuButtons[0].length) {
+                                            JOptionPane.showMessageDialog(null, "Congratulations, you solved the sudoku!", 
+                                                                          "Sudoku", JOptionPane.PLAIN_MESSAGE);
+                                            setEnabledBottomPanelButtons(false);
+                                        }
+                                        
                                         chosenSudokuButton = idleButton;
                                         break loop;
                                     }
@@ -310,12 +320,12 @@ public class Homework3 {
                                 }
                                 else {
                                     chosenSudokuButton.setText("");
-                                    chosenSudokuButton = idleButton;
                                     for (int k = 0; k < addingNumberSequence.size(); k++) {
                                         if (chosenSudokuButton.equals(addingNumberSequence.get(k))) {
-                                            addingNumberSequence.remove(i);
+                                            addingNumberSequence.remove(k);
                                         }
                                     }
+                                    chosenSudokuButton = idleButton;
                                     
                                     break loop;
                                 }
@@ -369,7 +379,7 @@ public class Homework3 {
         checkBox.setEnabled(bool);
         solveButton.setEnabled(bool);
     }
-    
+
     // ***repaintSudokuGrid***
     // Method to reapaint sudoku grid depending on
     // the number given as parameter
