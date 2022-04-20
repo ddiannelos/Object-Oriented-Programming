@@ -279,6 +279,7 @@ public class Homework3 {
         }
     };
 
+    // Action for the optionButtons
     Action optionButtonsAction = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -309,6 +310,9 @@ public class Homework3 {
         }
     };
 
+    // ***repaintSudokuGrid***
+    // Method to reapaint sudoku grid depending on
+    // the number given as parameter
     void repaintSudokuGrid(int number) {
         for (int i = 0; i < sudokuButtons.length; i++) {
             for (int j = 0; j < sudokuButtons[i].length; j++) {
@@ -326,9 +330,11 @@ public class Homework3 {
         }
     }
 
+    // ***checkCollisions***
+    // Method to check for collisions depending
+    // on the number give as parameter
     boolean checkCollisions(int number) {
         int i = 0, j = 0, success = 0;
-        System.out.println(number);
         loop: {
             for (i = 0; i < sudokuButtons.length; i++) {
                 for (j = 0; j < sudokuButtons[i].length; j++) {
@@ -338,11 +344,56 @@ public class Homework3 {
                 }
             }
         }
-
+        
+        // Find collisions to the same row
         for (int k = 0; k < sudokuButtons[i].length; k++) {
-            if (sudokuButtons[i][k].getText() == String.valueOf(number)) {
+            if (chosenSudokuButton.equals(sudokuButtons[i][k])) {
+                continue;
+            }
+            
+            if (sudokuButtons[i][k].getText().compareTo(String.valueOf(number)) == 0) {
                 sudokuButtons[i][k].setBackground(Color.RED);
                 success++;
+            }
+        }
+        
+        // Find collisions to the same collumn
+        for (int k = 0; k < sudokuButtons[i].length; k++) {
+            if (chosenSudokuButton.equals(sudokuButtons[k][j])) {
+                continue;
+            }
+            
+            if (sudokuButtons[k][j].getText().compareTo(String.valueOf(number)) == 0) {
+                sudokuButtons[k][j].setBackground(Color.RED);
+                success++;
+            }
+        }
+
+        // Find collisions to the same block
+        int panelStartingPositionX = i, panelStartingPositionY = j;
+        
+        while (panelStartingPositionX%3 != 0 || panelStartingPositionY%3 != 0) {
+            if (panelStartingPositionX%3 != 0) {
+                panelStartingPositionX--;
+            }
+            if (panelStartingPositionY%3 != 0) {
+                panelStartingPositionY--;
+            }
+        } 
+
+        for (int k = 0; k < 3; k++) {
+            for (int l = 0; l < 3; l++) {
+                int x = k + panelStartingPositionX;
+                int y = l + panelStartingPositionY;
+                
+                if (chosenSudokuButton.equals(sudokuButtons[x][y])) {
+                    continue;
+                }
+
+                if (sudokuButtons[x][y].getText().compareTo(String.valueOf(number)) == 0) {
+                    sudokuButtons[x][y].setBackground(Color.RED);
+                    success++;
+                }
             }
         }
         
