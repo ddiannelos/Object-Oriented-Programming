@@ -18,6 +18,7 @@ import java.util.ArrayList;
 
 public class Homework3 {
     private JFrame frame;
+    
     private JMenuItem easy, intermediate, expert;
     private JMenu newGame;
     private JMenuBar bar;
@@ -35,7 +36,9 @@ public class Homework3 {
     private List<JButton> addingNumberSequence = new ArrayList<>();
     
     private JCheckBox checkBox;
+    
     private Color yellowRGB = new Color(255,255,200);
+    private Color blueRGB = new Color(51,153,255);
     
     private int initializedButtonsNumber = 0;
     private int[][] solvedSudoku = new int[9][9];
@@ -199,6 +202,9 @@ public class Homework3 {
                 URLConnection gameURLConn = gameURL.openConnection();
                 InputStream gameURLInput = gameURLConn.getInputStream();
 
+                initializedButtonsNumber = 0;
+                addingNumberSequence.clear();
+                
                 // Copy the content of the URL and create the sudoku grid
                 for (int i = 0; i < sudokuButtons.length; i++) {
                     for (int j = 0; j < sudokuButtons[i].length; j++) {
@@ -319,10 +325,10 @@ public class Homework3 {
                                         for (int l = 0; l < addingNumberSequence.size(); l++) {
                                             if (addingNumberSequence.get(l).equals(chosenSudokuButton) == true) {
                                                 addingNumberSequence.remove(l);
+                                                break;
                                             }
                                         }
                                         addingNumberSequence.add(sudokuButtons[j][k]);
-                                        
                                         
                                         // Check if the numbers that was initialized and 
                                         // the numbers that the player assigned are equal
@@ -338,7 +344,7 @@ public class Homework3 {
                                         // paint the button pressed accordingly
                                         if (verifyMode == true) {
                                             if (solvedSudoku[j][k] != Integer.valueOf(chosenSudokuButton.getText())) {
-                                                chosenSudokuButton.setBackground(Color.BLUE);
+                                                chosenSudokuButton.setBackground(blueRGB);
                                             }
                                             else {
                                                 chosenSudokuButton.setBackground(Color.WHITE);
@@ -424,6 +430,7 @@ public class Homework3 {
                 setEnabledBottomPanelButtons(false);
                 
                 chosenSudokuButton = idleButton;
+
                 gameOn = false;
             }
             
@@ -487,7 +494,7 @@ public class Homework3 {
                 String string = sudokuButtons[i][j].getText();
                 
                 if (string != "" && solvedSudoku[i][j] != Integer.valueOf(string)) {
-                    sudokuButtons[i][j].setBackground(Color.BLUE);
+                    sudokuButtons[i][j].setBackground(blueRGB);
                 }
                 else if (string != "" && number == Integer.valueOf(string)) {
                     sudokuButtons[i][j].setBackground(yellowRGB);
