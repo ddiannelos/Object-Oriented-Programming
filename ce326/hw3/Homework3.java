@@ -1,17 +1,19 @@
 package ce326.hw3;
 
 import javax.swing.*;
+
 import java.awt.event.*;
-import java.io.File;
-import java.io.FileWriter;
+import java.awt.*;
+
 import java.io.IOException;
 import java.io.InputStream;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+
 import java.util.List;
 import java.util.ArrayList;
-import java.awt.*;
 
 
 public class Homework3 {
@@ -19,20 +21,25 @@ public class Homework3 {
     private JMenuItem easy, intermediate, expert;
     private JMenu newGame;
     private JMenuBar bar;
+    
     private JPanel outerCenterPanel;
     private JPanel[][] innerCenterPanels = new JPanel[3][3];
-    private JButton[][] sudokuButtons = new JButton[9][9];
     private JPanel bottomPanel;
+    
+    private JButton[][] sudokuButtons = new JButton[9][9];
     private JButton[] numButtons = new JButton[9];
     private JButton removeButton, undoButton, solveButton;
-    private JCheckBox checkBox;
     private Boolean[][] initializedButtons = new Boolean[9][9];
-    private int initializedButtonsNumber = 0;
-    private Color yellowRGB = new Color(255,255,200);
     private JButton idleButton = new JButton();
     private JButton chosenSudokuButton = idleButton;
     private List<JButton> addingNumberSequence = new ArrayList<>();
+    
+    private JCheckBox checkBox;
+    private Color yellowRGB = new Color(255,255,200);
+    
+    private int initializedButtonsNumber = 0;
     private int[][] solvedSudoku = new int[9][9];
+    
     private boolean gameOn = false;
     private boolean verifyMode = false;
     
@@ -117,7 +124,7 @@ public class Homework3 {
         bottomPanel.setBounds(0,550,700,150);
         bottomPanel.setLayout(new FlowLayout());
         
-        // Create Buttons for the BottomPanel
+        // Create ButtonsNumber for the BottomPanel
         for (int i = 0; i < numButtons.length; i++) {
             numButtons[i] = new JButton(String.valueOf(i+1));
             numButtons[i].setFocusable(false);
@@ -130,6 +137,8 @@ public class Homework3 {
             bottomPanel.add(numButtons[i]);
         }
         
+        // Create OptionButtons and CheckBox for 
+        // BottomPanel
         removeButton = new JButton("remove");
         // need icon
         removeButton.setFocusable(false);
@@ -173,6 +182,8 @@ public class Homework3 {
         public void actionPerformed(ActionEvent event) {           
             String URLName;
 
+            // Depending on the difficulty use the appropriate
+            // URL
             if (event.getSource() == easy) {
                 URLName = new String("http://gthanos.inf.uth.gr/~gthanos/sudoku/exec.php?difficulty=easy");
             }
@@ -188,6 +199,7 @@ public class Homework3 {
                 URLConnection gameURLConn = gameURL.openConnection();
                 InputStream gameURLInput = gameURLConn.getInputStream();
 
+                // Copy the content of the URL and create the sudoku grid
                 for (int i = 0; i < sudokuButtons.length; i++) {
                     for (int j = 0; j < sudokuButtons[i].length; j++) {
                         char sudokuNumber = (char) gameURLInput.read();
@@ -231,41 +243,32 @@ public class Homework3 {
         public void actionPerformed(ActionEvent e) {
             int number = 0;
             
-            for (int i = 0; i < sudokuButtons.length; i++) {
-                for (int j = 0; j < sudokuButtons[i].length; j++) {
-                    if (initializedButtons[i][j]) {
-                        sudokuButtons[i][j].setBackground(Color.GRAY);
-                    }
-                    else {
-                        sudokuButtons[i][j].setBackground(Color.WHITE);
-                    }
-                    
-                    if (e.getSource() == sudokuButtons[i][j]) {
-                        String string = sudokuButtons[i][j].getText();
-                        if (string != "") {
-                            number = Integer.valueOf(string);
+            loop: {
+                // Find the sudokuButton that was pressed
+                for (int i = 0; i < sudokuButtons.length; i++) {
+                    for (int j = 0; j < sudokuButtons[i].length; j++) {
+                        if (e.getSource() == sudokuButtons[i][j]) {
+                            String string = sudokuButtons[i][j].getText();
+                            if (string != "") {
+                                number = Integer.valueOf(string);
+                            }
+                            chosenSudokuButton = sudokuButtons[i][j];
+
+                            break loop;
                         }
-                        sudokuButtons[i][j].setBackground(yellowRGB);
-                        chosenSudokuButton = sudokuButtons[i][j];
                     }
                 }
             }
 
-            if (number != 0) {
-                if (verifyMode == true) {
-                    paintVerifiedSudokuGrid(number);
-                }
-                else {
-                    repaintSudokuGrid(number);
-                }
+            // Depnding on the verifyMode, paint
+            // the sudoku grid accordingly
+            if (verifyMode == true) {
+                paintVerifiedSudokuGrid(number);
             }
             else {
-                if (verifyMode == true) {
-                    paintVerifiedSudokuGrid(number);
-                    chosenSudokuButton.setBackground(yellowRGB);
-                }
+                repaintSudokuGrid(number);
             }
-
+            chosenSudokuButton.setBackground(yellowRGB);
         }
     };
 
@@ -273,10 +276,14 @@ public class Homework3 {
     Action numberButtonsAction = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
+            // If chosenSudokuButton is idle then
+            // don't do anything
             if (chosenSudokuButton.equals(idleButton)) {
                 return;
             }
             
+            // Depending on the verifyMode, paint
+            // the sudoku grid accordingly
             if (verifyMode == true) {
                 paintVerifiedSudokuGrid(0);
             }
@@ -287,20 +294,39 @@ public class Homework3 {
             int number = 0;
 
             loop: {
+                // Find the numButton that was pressed
                 for (int i = 0; i < numButtons.length; i++) {
                     if (e.getSource() == numButtons[i]) {
+                        // Find which sudokuButton is pressed at the moment
                         for (int j = 0; j < sudokuButtons.length; j++) {
                             for (int k = 0; k < sudokuButtons[j].length; k++) {
                                 if (chosenSudokuButton.equals(sudokuButtons[j][k])) {
+                                    // Check if the button pressed, is an initialized
+                                    // one
                                     if (initializedButtons[j][k] == false) {
                                         number = i+1;
+                                        
+                                        // Check if the number can be assigned to the
+                                        // button pressed depending on the sudoku rules
                                         if (checkCollisions(number) == false) {
                                             chosenSudokuButton.setBackground(yellowRGB);
                                             return;
                                         }
                                         chosenSudokuButton.setText(String.valueOf(number));
+                                        
+                                        // Check if the current button pressed is already
+                                        // in the addingNumberSequence
+                                        for (int l = 0; l < addingNumberSequence.size(); l++) {
+                                            if (addingNumberSequence.get(l).equals(chosenSudokuButton) == true) {
+                                                addingNumberSequence.remove(l);
+                                            }
+                                        }
                                         addingNumberSequence.add(sudokuButtons[j][k]);
                                         
+                                        
+                                        // Check if the numbers that was initialized and 
+                                        // the numbers that the player assigned are equal
+                                        // to the size of the sudoku
                                         if (addingNumberSequence.size()+initializedButtonsNumber == 
                                                                         sudokuButtons.length*sudokuButtons[0].length) {
                                             JOptionPane.showMessageDialog(null, "Congratulations, you solved the sudoku!", 
@@ -308,9 +334,14 @@ public class Homework3 {
                                             setEnabledBottomPanelButtons(false);
                                         }
                                         
+                                        // Check if the verifyMode is on, and
+                                        // paint the button pressed accordingly
                                         if (verifyMode == true) {
                                             if (solvedSudoku[j][k] != Integer.valueOf(chosenSudokuButton.getText())) {
                                                 chosenSudokuButton.setBackground(Color.BLUE);
+                                            }
+                                            else {
+                                                chosenSudokuButton.setBackground(Color.WHITE);
                                             }
                                         }
 
@@ -330,61 +361,74 @@ public class Homework3 {
     Action optionButtonsAction = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            loop : {
-                if (e.getSource() == removeButton) {
-                    if (chosenSudokuButton.equals(idleButton)) {
-                        return;
-                    }
-                    
+            // Find the optionButton that was pressed
+            if (e.getSource() == removeButton) {
+                // Check if chosenSudokuButton is the idle one
+                if (chosenSudokuButton.equals(idleButton)) {
+                    return;
+                }
+                
+                loop: {
+                    // Find the sudokuButton that is pressed
                     for (int i = 0; i < sudokuButtons.length; i++) {
                         for (int j = 0; j < sudokuButtons[i].length; j++) {
                             if (chosenSudokuButton.equals(sudokuButtons[i][j])) {
+                                // Check if the sudokuButton is an
+                                // initialized one
                                 if (initializedButtons[i][j]) {
                                     return;
                                 }
-                                else {
-                                    chosenSudokuButton.setText("");
-                                    for (int k = 0; k < addingNumberSequence.size(); k++) {
-                                        if (chosenSudokuButton.equals(addingNumberSequence.get(k))) {
-                                            addingNumberSequence.remove(k);
-                                        }
+                                
+                                chosenSudokuButton.setText("");
+                                
+                                // Find the button remove on the adding NumberSequence
+                                // and remove it from the list
+                                for (int k = 0; k < addingNumberSequence.size(); k++) {
+                                    if (chosenSudokuButton.equals(addingNumberSequence.get(k))) {
+                                        addingNumberSequence.remove(k);
                                     }
-                                    chosenSudokuButton = idleButton;
-                                    
-                                    break loop;
                                 }
+                                chosenSudokuButton = idleButton;
+                                
+                                break loop;
                             }
                         }
                     }
-                }
-                else if (e.getSource() == undoButton) {
-                    if (addingNumberSequence.size() == 0) {
-                        return;
-                    }
-                    addingNumberSequence.get(addingNumberSequence.size()-1).setText("");
-                    addingNumberSequence.remove(addingNumberSequence.size()-1);
-                    chosenSudokuButton = idleButton;
-                }
-                else if (e.getSource() == solveButton) {
-                    if (gameOn == false) {
-                        return;
-                    }
-
-                    for (int i = 0; i < sudokuButtons.length; i++) {
-                        for (int j = 0; j < sudokuButtons[i].length; j++) {
-                            if (initializedButtons[i][j] == true) {
-                                continue;
-                            }
-                            sudokuButtons[i][j].setText(String.valueOf(solvedSudoku[i][j]));
-                        }
-                    }
-                    setEnabledBottomPanelButtons(false);
-                    
-                    chosenSudokuButton = idleButton;
-                    gameOn = false;
                 }
             }
+            else if (e.getSource() == undoButton) {
+                // Check if the addingNumberSequence is empty
+                if (addingNumberSequence.size() == 0) {
+                    return;
+                }
+                
+                addingNumberSequence.get(addingNumberSequence.size()-1).setText("");
+                addingNumberSequence.remove(addingNumberSequence.size()-1);
+                chosenSudokuButton = idleButton;
+            }
+            else if (e.getSource() == solveButton) {
+                // Check if the game has started
+                if (gameOn == false) {
+                    return;
+                }
 
+                
+                for (int i = 0; i < sudokuButtons.length; i++) {
+                    for (int j = 0; j < sudokuButtons[i].length; j++) {
+                        if (initializedButtons[i][j] == true) {
+                            continue;
+                        }
+                        sudokuButtons[i][j].setText(String.valueOf(solvedSudoku[i][j]));
+                    }
+                }
+                setEnabledBottomPanelButtons(false);
+                
+                chosenSudokuButton = idleButton;
+                gameOn = false;
+            }
+            
+            // Depending on the verifyMode, paint
+            // the sudoku grid accordingly
             if (verifyMode == true) {
                 paintVerifiedSudokuGrid(0);
             }
@@ -394,39 +438,41 @@ public class Homework3 {
         }
     };
 
+    // ItemListener for the checkbox
     ItemListener checkBoxListener = new ItemListener() {
         @Override
         public void itemStateChanged(ItemEvent e) {
-            if (e.getItemSelectable() == checkBox) {
-                if(e.getStateChange() == ItemEvent.SELECTED) {
-                    verifyMode = true;
-                    
-                    if (gameOn == false) {
-                        return;
-                    }
-
-                    if (chosenSudokuButton.equals(idleButton) == true || chosenSudokuButton.getText() == "") {
-                        paintVerifiedSudokuGrid(0);
-                        chosenSudokuButton.setBackground(yellowRGB);
-                    }
-                    else {
-                        paintVerifiedSudokuGrid(Integer.valueOf(chosenSudokuButton.getText()));
-                    }
+            // Check if the checkBox was selected
+            if(e.getStateChange() == ItemEvent.SELECTED) {
+                verifyMode = true;
+                
+                // Check if the game has started
+                if (gameOn == false) {
+                    return;
                 }
-                else if (e.getStateChange() == ItemEvent.DESELECTED) {
-                    verifyMode = false;
 
-                    if (gameOn == false) {
-                        return;
-                    }
-                    
-                    if (chosenSudokuButton.equals(idleButton) == true || chosenSudokuButton.getText() == "") {
-                        repaintSudokuGrid(0);
-                        chosenSudokuButton.setBackground(yellowRGB);
-                    }
-                    else {
-                        repaintSudokuGrid(Integer.valueOf(chosenSudokuButton.getText()));
-                    }
+                if (chosenSudokuButton.equals(idleButton) == true || chosenSudokuButton.getText() == "") {
+                    paintVerifiedSudokuGrid(0);
+                    chosenSudokuButton.setBackground(yellowRGB);
+                }
+                else {
+                    paintVerifiedSudokuGrid(Integer.valueOf(chosenSudokuButton.getText()));
+                }
+            }
+            else if (e.getStateChange() == ItemEvent.DESELECTED) {
+                verifyMode = false;
+
+                // Check if the game has started
+                if (gameOn == false) {
+                    return;
+                }
+                
+                if (chosenSudokuButton.equals(idleButton) == true || chosenSudokuButton.getText() == "") {
+                    repaintSudokuGrid(0);
+                    chosenSudokuButton.setBackground(yellowRGB);
+                }
+                else {
+                    repaintSudokuGrid(Integer.valueOf(chosenSudokuButton.getText()));
                 }
             }
         }
