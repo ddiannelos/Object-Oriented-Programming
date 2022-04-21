@@ -34,6 +34,7 @@ public class Homework3 {
     private List<JButton> addingNumberSequence = new ArrayList<>();
     private int[][] solvedSudoku = new int[9][9];
     private boolean gameOn = false;
+    private boolean verifyMode = false;
     
     public Homework3() {
         // Create frame
@@ -150,6 +151,7 @@ public class Homework3 {
         checkBox.setText("Verify your solution");
         checkBox.setFocusable(false);
         checkBox.setBackground(Color.LIGHT_GRAY);
+        checkBox.addItemListener(checkBoxListener);
         bottomPanel.add(checkBox);
         
         solveButton = new JButton("solve");
@@ -182,7 +184,7 @@ public class Homework3 {
             }
 
             try {
-                URL gameURL = new URL(URLName);
+                URL gameURL = new URL(URLName);                    
                 URLConnection gameURLConn = gameURL.openConnection();
                 InputStream gameURLInput = gameURLConn.getInputStream();
 
@@ -250,7 +252,18 @@ public class Homework3 {
             }
 
             if (number != 0) {
-                repaintSudokuGrid(number);
+                if (verifyMode == true) {
+                    paintVerifiedSudokuGrid(number);
+                }
+                else {
+                    repaintSudokuGrid(number);
+                }
+            }
+            else {
+                if (verifyMode == true) {
+                    paintVerifiedSudokuGrid(number);
+                    chosenSudokuButton.setBackground(yellowRGB);
+                }
             }
 
         }
@@ -264,7 +277,12 @@ public class Homework3 {
                 return;
             }
             
-            repaintSudokuGrid(0);
+            if (verifyMode == true) {
+                paintVerifiedSudokuGrid(0);
+            }
+            else {
+                repaintSudokuGrid(0);
+            }
 
             int number = 0;
 
@@ -290,6 +308,12 @@ public class Homework3 {
                                             setEnabledBottomPanelButtons(false);
                                         }
                                         
+                                        if (verifyMode == true) {
+                                            if (solvedSudoku[j][k] != Integer.valueOf(chosenSudokuButton.getText())) {
+                                                chosenSudokuButton.setBackground(Color.BLUE);
+                                            }
+                                        }
+
                                         chosenSudokuButton = idleButton;
                                         break loop;
                                     }
@@ -298,7 +322,7 @@ public class Homework3 {
                         }          
                     }
                 }
-            }  
+            }
         }
     };
 
@@ -340,8 +364,6 @@ public class Homework3 {
                     addingNumberSequence.get(addingNumberSequence.size()-1).setText("");
                     addingNumberSequence.remove(addingNumberSequence.size()-1);
                     chosenSudokuButton = idleButton;
-
-                    return;
                 }
                 else if (e.getSource() == solveButton) {
                     if (gameOn == false) {
@@ -363,9 +385,76 @@ public class Homework3 {
                 }
             }
 
-            repaintSudokuGrid(0);
+            if (verifyMode == true) {
+                paintVerifiedSudokuGrid(0);
+            }
+            else {
+                repaintSudokuGrid(0);
+            }
         }
     };
+
+    ItemListener checkBoxListener = new ItemListener() {
+        @Override
+        public void itemStateChanged(ItemEvent e) {
+            if (e.getItemSelectable() == checkBox) {
+                if(e.getStateChange() == ItemEvent.SELECTED) {
+                    verifyMode = true;
+                    
+                    if (gameOn == false) {
+                        return;
+                    }
+
+                    if (chosenSudokuButton.equals(idleButton) == true || chosenSudokuButton.getText() == "") {
+                        paintVerifiedSudokuGrid(0);
+                        chosenSudokuButton.setBackground(yellowRGB);
+                    }
+                    else {
+                        paintVerifiedSudokuGrid(Integer.valueOf(chosenSudokuButton.getText()));
+                    }
+                }
+                else if (e.getStateChange() == ItemEvent.DESELECTED) {
+                    verifyMode = false;
+
+                    if (gameOn == false) {
+                        return;
+                    }
+                    
+                    if (chosenSudokuButton.equals(idleButton) == true || chosenSudokuButton.getText() == "") {
+                        repaintSudokuGrid(0);
+                        chosenSudokuButton.setBackground(yellowRGB);
+                    }
+                    else {
+                        repaintSudokuGrid(Integer.valueOf(chosenSudokuButton.getText()));
+                    }
+                }
+            }
+        }
+    };
+
+    // ***paintVerifiedSudokuGrid***
+    // Method that paints the grid appropriately
+    // when verify mode is on
+    void paintVerifiedSudokuGrid(int number) {
+        for (int i = 0; i < sudokuButtons.length; i++) {
+            for (int j = 0; j < sudokuButtons[i].length; j++) {
+                String string = sudokuButtons[i][j].getText();
+                
+                if (string != "" && solvedSudoku[i][j] != Integer.valueOf(string)) {
+                    sudokuButtons[i][j].setBackground(Color.BLUE);
+                }
+                else if (string != "" && number == Integer.valueOf(string)) {
+                    sudokuButtons[i][j].setBackground(yellowRGB);
+                }
+                else if (string != "" && initializedButtons[i][j]) {
+                    sudokuButtons[i][j].setBackground(Color.GRAY);
+                }
+                else {
+                    sudokuButtons[i][j].setBackground(Color.WHITE);
+                }
+            }
+        }
+    }
 
     // ***setEnabledBottomPanelButtons
     // Method that enables the ButtopPanel
