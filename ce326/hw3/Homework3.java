@@ -142,8 +142,8 @@ public class Homework3 {
         
         // Create OptionButtons and CheckBox for 
         // BottomPanel
-        removeButton = new JButton("remove");
-        // need icon
+        Image image = new ImageIcon("eraser.png").getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH);
+        JButton removeButton = new JButton(new ImageIcon(image));
         removeButton.setFocusable(false);
         removeButton.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).
                      put(KeyStroke.getKeyStroke("BACK_SPACE"), "remove");
@@ -153,8 +153,8 @@ public class Homework3 {
         removeButton.addActionListener(optionButtonsAction);
         bottomPanel.add(removeButton);
         
-        undoButton = new JButton("undo");
-        //need icon
+        image = new ImageIcon("undo.png").getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH);
+        JButton undoButton = new JButton(new ImageIcon(image));
         undoButton.setFocusable(false);
         undoButton.addActionListener(optionButtonsAction);
         bottomPanel.add(undoButton);
@@ -166,8 +166,8 @@ public class Homework3 {
         checkBox.addItemListener(checkBoxListener);
         bottomPanel.add(checkBox);
         
-        solveButton = new JButton("solve");
-        // need icon
+        image = new ImageIcon("rubik.png").getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH);
+        JButton solveButton = new JButton(new ImageIcon(image));
         solveButton.setFocusable(false);
         solveButton.addActionListener(optionButtonsAction);
         bottomPanel.add(solveButton);
