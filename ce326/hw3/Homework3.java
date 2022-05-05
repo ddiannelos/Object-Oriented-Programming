@@ -30,7 +30,6 @@ public class Homework3 {
     private JButton[][] sudokuButtons = new JButton[9][9];
     private JButton[] numButtons = new JButton[9];
     private JButton removeButton, undoButton, solveButton;
-    private Boolean[][] initializedButtons = new Boolean[9][9];
     private JButton idleButton = new JButton();
     private JButton chosenSudokuButton = idleButton;
     private List<JButton> addingNumberSequence = new ArrayList<>();
@@ -45,6 +44,7 @@ public class Homework3 {
     
     private boolean gameOn = false;
     private boolean verifyMode = false;
+    private boolean[][] initializedButtons = new boolean[9][9];
     
     public Homework3() {
         // Create frame
@@ -143,7 +143,7 @@ public class Homework3 {
         // Create OptionButtons and CheckBox for 
         // BottomPanel
         Image image = new ImageIcon("eraser.png").getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH);
-        JButton removeButton = new JButton(new ImageIcon(image));
+        removeButton = new JButton(new ImageIcon(image));
         removeButton.setFocusable(false);
         removeButton.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).
                      put(KeyStroke.getKeyStroke("BACK_SPACE"), "remove");
@@ -154,7 +154,7 @@ public class Homework3 {
         bottomPanel.add(removeButton);
         
         image = new ImageIcon("undo.png").getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH);
-        JButton undoButton = new JButton(new ImageIcon(image));
+        undoButton = new JButton(new ImageIcon(image));
         undoButton.setFocusable(false);
         undoButton.addActionListener(optionButtonsAction);
         bottomPanel.add(undoButton);
@@ -167,7 +167,7 @@ public class Homework3 {
         bottomPanel.add(checkBox);
         
         image = new ImageIcon("rubik.png").getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH);
-        JButton solveButton = new JButton(new ImageIcon(image));
+        solveButton = new JButton(new ImageIcon(image));
         solveButton.setFocusable(false);
         solveButton.addActionListener(optionButtonsAction);
         bottomPanel.add(solveButton);
