@@ -32,7 +32,6 @@ public class Homework3 {
     private JButton removeButton, undoButton, solveButton;
     private JButton idleButton = new JButton();
     private JButton chosenSudokuButton = idleButton;
-    private List<JButton> addingNumberSequence = new ArrayList<>();
     
     private JCheckBox checkBox;
     
@@ -40,11 +39,14 @@ public class Homework3 {
     private Color blueRGB = new Color(51,153,255);
     
     private int initializedButtonsNumber = 0;
+    private int insertedButtons = 0;
     private int[][] solvedSudoku = new int[9][9];
     
     private boolean gameOn = false;
     private boolean verifyMode = false;
     private boolean[][] initializedButtons = new boolean[9][9];
+
+    private List<OptionEvent> numberSequence = new ArrayList<>();
     
     public Homework3() {
         // Create frame
@@ -179,6 +181,33 @@ public class Homework3 {
         frame.setVisible(true);
     }
 
+    // Class to save needed info to perform
+    // undo option
+    private class OptionEvent {
+        private JButton button;
+        private char option;
+        private int number;
+
+        OptionEvent (JButton button, char option, int number) {
+            this.button = button;
+            this.option = option;
+            this.number = number;
+        }
+
+        public JButton getButton() {
+            return button;
+        }
+
+        public char getOption() {
+            return option;
+        }
+
+        public int getNumber() {
+            return number;
+        }
+    }
+
+
     // Create ActionListener for the MenuItems
     ActionListener newGameListener = new ActionListener() {
         @Override
@@ -202,8 +231,10 @@ public class Homework3 {
                 URLConnection gameURLConn = gameURL.openConnection();
                 InputStream gameURLInput = gameURLConn.getInputStream();
 
+                // Initialize info for new game
                 initializedButtonsNumber = 0;
-                addingNumberSequence.clear();
+                insertedButtons = 0;
+                numberSequence.clear();
                 
                 // Copy the content of the URL and create the sudoku grid
                 for (int i = 0; i < sudokuButtons.length; i++) {
@@ -266,7 +297,7 @@ public class Homework3 {
                 }
             }
 
-            // Depnding on the verifyMode, paint
+            // Depending on the verifyMode, paint
             // the sudoku grid accordingly
             if (verifyMode == true) {
                 paintVerifiedSudokuGrid(number);
@@ -318,26 +349,26 @@ public class Homework3 {
                                             chosenSudokuButton.setBackground(yellowRGB);
                                             return;
                                         }
+                                        
+                                        // If there wasn't a number in the sudokuButton
+                                        // increase the numbersInserted in the sudoku
+                                        if (chosenSudokuButton.getText() == "") {
+                                            insertedButtons++;
+                                        }
+                                        // Add the insertion in the list
+                                        numberSequence.add(new OptionEvent(sudokuButtons[j][k], 'a', number));
+                                        
                                         chosenSudokuButton.setText(String.valueOf(number));
                                         
-                                        // Check if the current button pressed is already
-                                        // in the addingNumberSequence
-                                        for (int l = 0; l < addingNumberSequence.size(); l++) {
-                                            if (addingNumberSequence.get(l).equals(chosenSudokuButton) == true) {
-                                                addingNumberSequence.remove(l);
-                                                break;
-                                            }
-                                        }
-                                        addingNumberSequence.add(sudokuButtons[j][k]);
                                         
                                         // Check if the numbers that was initialized and 
-                                        // the numbers that the player assigned are equal
+                                        // the numbers that the player inserted are equal
                                         // to the size of the sudoku
-                                        if (addingNumberSequence.size()+initializedButtonsNumber == 
-                                                                        sudokuButtons.length*sudokuButtons[0].length) {
+                                        if (insertedButtons+initializedButtonsNumber == sudokuButtons.length*sudokuButtons[0].length) {
                                             JOptionPane.showMessageDialog(null, "Congratulations, you solved the sudoku!", 
-                                                                          "Sudoku", JOptionPane.PLAIN_MESSAGE);
+                                                                                "Sudoku", JOptionPane.PLAIN_MESSAGE);
                                             setEnabledBottomPanelButtons(false);
+                                                
                                         }
                                         
                                         // Check if the verifyMode is on, and
@@ -356,7 +387,7 @@ public class Homework3 {
                                     }
                                 }
                             }
-                        }          
+                        }
                     }
                 }
             }
@@ -380,20 +411,21 @@ public class Homework3 {
                         for (int j = 0; j < sudokuButtons[i].length; j++) {
                             if (chosenSudokuButton.equals(sudokuButtons[i][j])) {
                                 // Check if the sudokuButton is an
-                                // initialized one
-                                if (initializedButtons[i][j]) {
+                                // initialized one or it doesn't have
+                                // a number in it
+                                if (initializedButtons[i][j] || chosenSudokuButton.getText() == "") {
                                     return;
                                 }
+                                
+                                // Add the removal in the list and decrease 
+                                // the numberInserted in the sudoku
+                                numberSequence.add(new OptionEvent(sudokuButtons[i][j], 'r', Integer.valueOf(chosenSudokuButton.getText())));
+                                insertedButtons--;
                                 
                                 chosenSudokuButton.setText("");
                                 
                                 // Find the button remove on the adding NumberSequence
                                 // and remove it from the list
-                                for (int k = 0; k < addingNumberSequence.size(); k++) {
-                                    if (chosenSudokuButton.equals(addingNumberSequence.get(k))) {
-                                        addingNumberSequence.remove(k);
-                                    }
-                                }
                                 chosenSudokuButton = idleButton;
                                 
                                 break loop;
@@ -404,12 +436,39 @@ public class Homework3 {
             }
             else if (e.getSource() == undoButton) {
                 // Check if the addingNumberSequence is empty
-                if (addingNumberSequence.size() == 0) {
+                if (numberSequence.size() == 0) {
                     return;
                 }
                 
-                addingNumberSequence.get(addingNumberSequence.size()-1).setText("");
-                addingNumberSequence.remove(addingNumberSequence.size()-1);
+                // Find the lastPosition of the list
+                int lastObjectPosition = numberSequence.size()-1;
+                
+                // Depending on the last action
+                // perform a removal or insertion
+                switch (numberSequence.get(lastObjectPosition).getOption()) {
+                    // If the last action was a removal
+                    // add the last number in the sudoku grid
+                    case 'r': {
+                        JButton button = numberSequence.get(lastObjectPosition).getButton();
+                        int number = numberSequence.get(lastObjectPosition).getNumber();
+                        
+                        insertedButtons++;
+                        button.setText(String.valueOf(number));
+                        
+                        break;
+                    }
+                    // If the last  action was a insertion
+                    // remove the last number from the sudoku grid
+                    case 'a': {
+                        JButton button = numberSequence.get(lastObjectPosition).getButton();
+                        
+                        insertedButtons--;
+                        button.setText("");                        
+                        
+                        break;
+                    }
+                }
+                numberSequence.remove(lastObjectPosition);
                 chosenSudokuButton = idleButton;
             }
             else if (e.getSource() == solveButton) {
