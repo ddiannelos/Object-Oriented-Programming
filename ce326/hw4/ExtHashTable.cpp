@@ -30,7 +30,7 @@ bool ExtHashTable::remove(const char* s) {
 
 }
 
-ExtHashTable& ExtHashTAble::operator=(const ExtHashTable& t) {
+ExtHashTable& ExtHashTable::operator=(const ExtHashTable& t) {
 
 }
 
@@ -58,11 +58,11 @@ ExtHashTable& ExtHashTable::operator+=(const char* s) {
 
 }
 
-bool ExtHashTable::operator-=(const string& str) {
+ExtHashTable& ExtHashTable::operator-=(const string& str) {
 
 }
 
-bool ExtHashTable::operator-=(const char* s) {
+ExtHashTable& ExtHashTable::operator-=(const char* s) {
 
 }
 
