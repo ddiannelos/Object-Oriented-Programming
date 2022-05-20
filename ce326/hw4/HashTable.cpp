@@ -10,6 +10,9 @@ HashTable::HashTable(int capacity) {
     size = 0;
     this->capacity = capacity;
     table = new string*[capacity];
+
+    for (int i = 0; i < capacity; i++)
+        table[i] = nullptr;
 }
 
 // ***CopyConstructor***
@@ -22,14 +25,18 @@ HashTable::HashTable(const HashTable& ht) {
     else {
         table = new string*[capacity];
         for (int i = 0; i < capacity; i++)
-            *table[i] = *ht.table[i];
+            if (ht.table[i] != nullptr) {
+                table[i] = new string;
+                *table[i] = *ht.table[i];
+            }
     }
 }
 
 // ***Deconstructor***
 HashTable::~HashTable() {
     for (int i = 0; i < capacity; i++)
-        delete table[i];
+        if (table[i] != nullptr)
+            delete table[i];
     delete[] table;
 }
 
@@ -189,44 +196,86 @@ string HashTable::print() const {
     return str;
 }
 
+// ***operator=***
 HashTable& HashTable::operator=(const HashTable& t) {
+    // If a hashTable already exists then
+    // delete everything inside
+    if (!table)
+        for (int i = 0; i < capacity; i++)
+            if (table[i] != nullptr)
+                delete table[i];
+        delete[] table;
+    
+    // Copy the contents of t
+    size = t.size;
+    capacity = t.capacity;
+    table = new string*[capacity];
 
+    for (int i = 0; i < capacity; i++)
+        if (t.table[i] != nullptr) {
+            table[i] = new string;
+            *table[i] = *t.table[i];
+        }
+    
+    return *this;
 }
 
+// ***operator+=***
 HashTable& HashTable::operator+=(const string& str) {
-
+    add(str);
+    return *this;
 }
 
+// ***operator+=***
 HashTable& HashTable::operator+=(const char* s) {
-
+    add(s);
+    return *this;
 }
 
+// ***operator-=***
 HashTable& HashTable::operator-=(const string& str) {
-
+    remove(str);
+    return *this;
 }
 
+// ***operator-=***
 HashTable& HashTable::operator-=(const char* s) {
-
+    remove(s);
+    return *this;
 }
 
+// ***operator+***
 HashTable HashTable::operator+(const string& str) const {
-
+    HashTable new_table(*this);
+    new_table.add(str);
+    return new_table;
 }
 
+// ***operator+***
 HashTable HashTable::operator+(const char* s) const {
-
+    HashTable new_table(*this);
+    new_table.add(s);
+    return new_table;
 }
 
+// ***operator-***
 HashTable HashTable::operator-(const string& str) const {
-
+    HashTable new_table(*this);
+    new_table.remove(str);
+    return new_table;
 }
 
+// ***operator-***
 HashTable HashTable::operator-(const char* s) const {
-
+    HashTable new_table(*this);
+    new_table.remove(s);
+    return new_table;
 }
 
+// ***operator<<***
 ostream& operator<<(ostream& stream, const HashTable& t) {
-
+    stream << t.print();
+    return stream;
 }
 
 HashTable::Iterator HashTable::begin() const {
