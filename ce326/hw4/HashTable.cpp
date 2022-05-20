@@ -75,20 +75,23 @@ bool HashTable::isAvailable(int pos) const {
 
 // ***add***
 bool HashTable::add(const string& s) {
-    // Get the hash value for the string
-    unsigned long pos = getHashCode(s.c_str());
-    int i;
+    // Get the hashCode for the string
+    unsigned long hashCode = getHashCode(s.c_str());
+    int i, pos;
 
     // Check if an available position
     // exists in the hashTable and 
     // the current string doesn't exist
     // in it
-    for (i = pos; i < capacity; i++) 
-        if (isAvailable(i))
+    for (int i = 0; i < capacity; i++) {
+        pos = (i + hashCode) % capacity;
+        
+        if (isAvailable(pos))
             break;
-        else if (*table[i] == s)
+        else if (*table[pos] == s)
             return false;
-    
+    }
+
     // If there is no space for the
     // string throw exception
     if (i == capacity) {
@@ -99,9 +102,9 @@ bool HashTable::add(const string& s) {
     // Insert the string to
     // the hashTable
     if (isEmpty(pos))
-        table[i] = new string;
+        table[pos] = new string;
     
-    *table[i] = s;
+    *table[pos] = s;
     size++;
 
     return true;
@@ -114,17 +117,20 @@ bool HashTable::add(const char* s) {
 
 // ***remove***
 bool HashTable::remove(const string& s) {
-    // Get the hashValue of the string
-    unsigned long pos = getHashCode(s.c_str());
-    int i;
+    // Get the hashCode of the string
+    unsigned long hashCode = getHashCode(s.c_str());
+    int i, pos;
 
     // Try to find the string in
     // the hashTable
-    for (i = pos; i < capacity; i++)
-        if (isEmpty(i))
+    for (i = 0; i < capacity; i++) {
+        pos = (i + hashCode) % capacity;
+        
+        if (isEmpty(pos))
             return false;
-        else if (!isTomb(i) && *table[i] == s)
+        else if (!isTomb(pos) && *table[pos] == s)
             break;
+    }
     
     // If the string doesn't exist
     // in the hashTable return, else
@@ -132,7 +138,7 @@ bool HashTable::remove(const string& s) {
     if (i == capacity)
         return false;
 
-    table[i] = (string *) TOMB;
+    table[pos] = (string *) TOMB;
     size--;
 
     return true;
@@ -145,16 +151,19 @@ bool HashTable::remove(const char* s) {
 
 // ***contains***
 bool HashTable::contains(const string& s) const {
-    // Get the hashValue of the string
-    unsigned long pos = getHashCode(s.c_str());
+    // Get the hashCode of the string
+    unsigned long hashCode = getHashCode(s.c_str());
 
     // Try to find the string inside
     // the hashTable
-    for (int i = pos; i < capacity; i++)
-        if (isEmpty(i))
+    for (int i = 0; i < capacity; i++) {
+        int pos = (i + hashCode) % capacity;
+        
+        if (isEmpty(pos))
             return false;
-        else if (!isTomb(i) && *table[i] == s)
+        else if (!isTomb(pos) && *table[pos] == s)
             return true;
+    }
     return false;
 }
 
