@@ -2,8 +2,11 @@
 #define __HASH_TABLE_HPP
 
 #include <string>
+#include "HashTableException.hpp"
 
 using namespace std;
+
+#define TOMB 0xFFFF
 
 class HashTable {    
     protected:
