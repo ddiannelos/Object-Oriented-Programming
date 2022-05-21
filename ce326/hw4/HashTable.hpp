@@ -50,7 +50,29 @@ class HashTable {
         HashTable operator-(const char* s) const;
 
         friend ostream& operator<<(ostream& stream, const HashTable& t);
-        class Iterator;
+        
+        class Iterator {
+            string** curr;
+            const HashTable* ht;
+            int position;
+
+            public:
+                Iterator(const HashTable* t, bool start = true);
+                Iterator(const Iterator& it);
+                
+                Iterator& operator=(const Iterator& it);
+
+                Iterator operator++();
+                Iterator operator++(int a);
+
+                bool operator==(const Iterator& it) const;
+                bool operator!=(const Iterator& it) const;
+
+                const string& operator*();
+                const string* operator->();
+
+                int pos() const;
+        };
 
         Iterator begin() const;
         Iterator end() const;

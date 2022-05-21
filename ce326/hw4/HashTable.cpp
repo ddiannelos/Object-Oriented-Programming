@@ -278,10 +278,14 @@ ostream& operator<<(ostream& stream, const HashTable& t) {
     return stream;
 }
 
+// ***begin***
 HashTable::Iterator HashTable::begin() const {
-
+    Iterator it(this);
+    return it;
 }
 
+// ***end***
 HashTable::Iterator HashTable::end() const {
-
+    Iterator it(this, false);
+    return it;
 }
