@@ -3,15 +3,13 @@
 // ***Constructor***
 ExtHashTable::ExtHashTable(double upper_bound_ratio, 
                            double lower_bound_ratio,
-                           int size) {
-    HashTable(size);
+                           int size) : HashTable(size) {
     this->upper_bound_ratio = upper_bound_ratio;
     this->lower_bound_ratio = lower_bound_ratio;
 }
 
 // ***CopyConstructor***
-ExtHashTable::ExtHashTable(const ExtHashTable& t) {
-    HashTable(t);
+ExtHashTable::ExtHashTable(const ExtHashTable& t) : HashTable(t) {
     upper_bound_ratio = t.upper_bound_ratio;
     lower_bound_ratio = t.lower_bound_ratio;
 }
@@ -55,7 +53,7 @@ void ExtHashTable::rehash() {
 
     // Copy the new hashtable to the 
     // old one
-    HashTable(newht);  
+    (HashTable) *this = newht;
 
     cout << "Size: " << size; 
     cout << ", New capacity: " << capacity << endl;  
@@ -97,46 +95,87 @@ bool ExtHashTable::remove(const char* s) {
     return false;
 }
 
+// ***operator=***
 ExtHashTable& ExtHashTable::operator=(const ExtHashTable& t) {
+    HashTable ht(t);
+    (HashTable) *this = ht;
+    upper_bound_ratio = t.upper_bound_ratio;
+    lower_bound_ratio = t.lower_bound_ratio;
 
+    return *this;
 }
 
+// ***operator+***
 ExtHashTable ExtHashTable::operator+(const string& str) const {
+    ExtHashTable newht(*this);
+    newht.add(str);
 
+    return newht;
 }
 
+// ***operator+***
 ExtHashTable ExtHashTable::operator+(const char* s) const {
+    ExtHashTable newht(*this);
+    newht.add(s);
 
+    return newht;
 }
 
+// ***operator-***
 ExtHashTable ExtHashTable::operator-(const string& str) const {
+    ExtHashTable newht(*this);
+    newht.remove(str);
 
+    return newht;
 }
 
+// ***operator-***
 ExtHashTable ExtHashTable::operator-(const char* s) const {
+    ExtHashTable newht(*this);
+    newht.remove(s);
 
+    return newht;
 }
 
+// ***operator+=***
 ExtHashTable& ExtHashTable::operator+=(const string& str) {
-
+    add(str);
+    return *this;
 }
 
+// ***operator+=***
 ExtHashTable& ExtHashTable::operator+=(const char* s) {
-
+    add(s);
+    return *this;
 }
 
+// ***operetor-=***
 ExtHashTable& ExtHashTable::operator-=(const string& str) {
-
+    remove(str);
+    return *this;
 }
 
+// ***operator-=***
 ExtHashTable& ExtHashTable::operator-=(const char* s) {
-
+    remove(s);
+    return *this;
 }
 
+// ***operator+***
 ExtHashTable ExtHashTable::operator+(const ExtHashTable& t) const {
-
+    ExtHashTable newht(*this);
+    for (int i = 0; i < t.getCapacity(); i++)
+        if (!t.isAvailable(i))
+            newht.add(*t.table[i]);
+    
+    return newht;
 }
 
+// ***operator+=***
 ExtHashTable& ExtHashTable::operator+=(const ExtHashTable& t) {
-
+    for (int i = 0; i < t.getCapacity(); i++)
+        if (!t.isAvailable(i))
+            add(*t.table[i]);
+    
+    return *this;
 }

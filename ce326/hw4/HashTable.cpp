@@ -90,7 +90,7 @@ bool HashTable::add(const string& s) {
     // exists in the hashTable and 
     // the current string doesn't exist
     // in it
-    for (int i = 0; i < capacity; i++) {
+    for (i = 0; i < capacity; i++) {
         pos = (i + hashCode) % capacity;
         
         if (isAvailable(pos))
@@ -200,11 +200,12 @@ string HashTable::print() const {
 HashTable& HashTable::operator=(const HashTable& t) {
     // If a hashTable already exists then
     // delete everything inside
-    if (!table)
+    if (!table) {
         for (int i = 0; i < capacity; i++)
             if (table[i] != nullptr)
                 delete table[i];
         delete[] table;
+    }
     
     // Copy the contents of t
     size = t.size;
