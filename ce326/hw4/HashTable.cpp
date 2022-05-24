@@ -29,6 +29,9 @@ HashTable::HashTable(const HashTable& ht) {
                 table[i] = new string;
                 *table[i] = *ht.table[i];
             }
+            else {
+                table[i] = nullptr;
+            }
     }
 }
 
@@ -70,14 +73,14 @@ bool HashTable::isEmpty(int pos) const {
 
 // ***isTomb***
 bool HashTable::isTomb(int pos) const {
-    if (pos >= capacity || table[pos] != (string*) TOMB)
+    if (pos >= capacity || (table[pos] != nullptr && *table[pos] != TOMB))
         return false;
     return true;
 }
 
 // ***isAvailable***
 bool HashTable::isAvailable(int pos) const {
-    return (isTomb(pos) || isEmpty(pos));
+    return (isEmpty(pos) || isTomb(pos));
 }
 
 // ***add***
@@ -86,17 +89,19 @@ bool HashTable::add(const string& s) {
     unsigned long hashCode = getHashCode(s.c_str());
     int i, pos;
 
+    // Check if the string already
+    // exsists in the hashTable
+    if (contains(s)) {
+        return false;
+    }
+
     // Check if an available position
-    // exists in the hashTable and 
-    // the current string doesn't exist
-    // in it
+    // exists in the hashTable
     for (i = 0; i < capacity; i++) {
         pos = (i + hashCode) % capacity;
         
         if (isAvailable(pos))
             break;
-        else if (*table[pos] == s)
-            return false;
     }
 
     // If there is no space for the
@@ -145,7 +150,7 @@ bool HashTable::remove(const string& s) {
     if (i == capacity)
         return false;
 
-    table[pos] = (string *) TOMB;
+    *table[pos] = TOMB;
     size--;
 
     return true;
@@ -217,6 +222,8 @@ HashTable& HashTable::operator=(const HashTable& t) {
             table[i] = new string;
             *table[i] = *t.table[i];
         }
+        else
+            table[i] = nullptr;
     
     return *this;
 }
