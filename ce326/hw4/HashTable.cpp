@@ -20,19 +20,15 @@ HashTable::HashTable(const HashTable& ht) {
     capacity = ht.capacity;
     size = ht.size;
 
-    if (ht.table == nullptr)
-        table = nullptr;
-    else {
-        table = new string*[capacity];
-        for (int i = 0; i < capacity; i++)
-            if (ht.table[i] != nullptr) {
-                table[i] = new string;
-                *table[i] = *ht.table[i];
-            }
-            else {
-                table[i] = nullptr;
-            }
-    }
+    table = new string*[capacity];
+    for (int i = 0; i < capacity; i++)
+        if (ht.table[i] != nullptr) {
+            table[i] = new string;
+            *table[i] = *ht.table[i];
+        }
+        else
+            table[i] = nullptr;
+    
 }
 
 // ***Deconstructor***
@@ -85,25 +81,27 @@ bool HashTable::isAvailable(int pos) const {
 
 // ***add***
 bool HashTable::add(const string& s) {
-    // Get the hashCode for the string
+    if (s == "")
+        return false;
+    
+    // // Get the hashCode for the string
     unsigned long hashCode = getHashCode(s.c_str());
     int i, pos;
 
-    // Check if the string already
-    // exsists in the hashTable
+    // // Check if the string already
+    // // exsists in the hashTable
     if (contains(s)) {
         return false;
     }
 
-    // Check if an available position
-    // exists in the hashTable
+    // // Check if an available position
+    // // exists in the hashTable
     for (i = 0; i < capacity; i++) {
         pos = (i + hashCode) % capacity;
         
         if (isAvailable(pos))
             break;
     }
-
     // If there is no space for the
     // string throw exception
     if (i == capacity) {
@@ -129,6 +127,9 @@ bool HashTable::add(const char* s) {
 
 // ***remove***
 bool HashTable::remove(const string& s) {
+    if (s == "")
+        return false;
+    
     // Get the hashCode of the string
     unsigned long hashCode = getHashCode(s.c_str());
     int i, pos;
@@ -140,7 +141,7 @@ bool HashTable::remove(const string& s) {
         
         if (isEmpty(pos))
             return false;
-        else if (!isTomb(pos) && *table[pos] == s)
+        else if (*table[pos] == s)
             break;
     }
     
@@ -163,6 +164,9 @@ bool HashTable::remove(const char* s) {
 
 // ***contains***
 bool HashTable::contains(const string& s) const {
+    if (s == "")
+        return false;
+    
     // Get the hashCode of the string
     unsigned long hashCode = getHashCode(s.c_str());
 
@@ -173,7 +177,7 @@ bool HashTable::contains(const string& s) const {
         
         if (isEmpty(pos))
             return false;
-        else if (!isTomb(pos) && *table[pos] == s)
+        else if (*table[pos] == s)
             return true;
     }
     return false;
@@ -205,12 +209,10 @@ string HashTable::print() const {
 HashTable& HashTable::operator=(const HashTable& t) {
     // If a hashTable already exists then
     // delete everything inside
-    if (!table) {
-        for (int i = 0; i < capacity; i++)
+    for (int i = 0; i < capacity; i++)
             if (table[i] != nullptr)
                 delete table[i];
-        delete[] table;
-    }
+    delete[] table;
     
     // Copy the contents of t
     size = t.size;
@@ -288,12 +290,10 @@ ostream& operator<<(ostream& stream, const HashTable& t) {
 
 // ***begin***
 HashTable::Iterator HashTable::begin() const {
-    Iterator it(this);
-    return it;
+    return Iterator(this);
 }
 
 // ***end***
 HashTable::Iterator HashTable::end() const {
-    Iterator it(this, false);
-    return it;
+    return Iterator(this, false);
 }

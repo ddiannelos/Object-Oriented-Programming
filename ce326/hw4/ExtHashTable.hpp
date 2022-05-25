@@ -6,7 +6,7 @@
 class ExtHashTable : public HashTable {
     private:
         double upper_bound_ratio, lower_bound_ratio;
-        void rehash();
+        void rehash(char option);
 
     public:
         ExtHashTable(double upper_bound_ratio = 0.5,

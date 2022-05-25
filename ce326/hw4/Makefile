@@ -1,21 +1,18 @@
-CFLAGS= -Wall -g -std=c++11 -fsanitize=address
+CFLAGS= -Wall -g
 
 all: main
 
-libHashTable: HashTable.o HashTableIterator.o ExtHashTable.o
-	ar cr $@.a $^
-
-HashTableIterator.o: HashTableIterator.cpp
-	g++ ${CFLAGS} $< -c
+main: HashTable.o HashTableIterator.o ExtHashTable.o
+	g++ ${CFLAGS} $^ HashTableException.hpp main.cpp -o $@
 
 HashTable.o: HashTable.cpp
-	g++ ${CFLAGS} $< -c
+	g++ ${CFLAGS} $^ -c
 
-ExtHashTable.o:: ExtHashTable.cpp
-	g++ ${CFLAGS} $< -c
+HashTableIterator.o: HashTableIterator.cpp
+	g++ ${CFLAGS} $^ -c
 
-main: libHashTable
-	g++ ${CFLAGS} main.cpp libHashTable.a -o main
+ExtHashTable.o: ExtHashTable.cpp
+	g++ ${CFLAGS} $^ -c
 
 clean:
-	rm *.o *.a main
+	rm *.o main

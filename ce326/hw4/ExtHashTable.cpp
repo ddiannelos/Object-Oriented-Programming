@@ -15,54 +15,64 @@ ExtHashTable::ExtHashTable(const ExtHashTable& t) : HashTable(t) {
 }
 
 // ***rehash***
-void ExtHashTable::rehash() {
+void ExtHashTable::rehash(char option) {
     // Calculate the rehashValue
-    double rehashValue = size/capacity;
+    double rehashValue = (double) size/capacity;
     int newCapacity = -1;
 
-    // If rehashValue is more than
-    // upperboundratio double the capacity
-    if (rehashValue > upper_bound_ratio)
-        newCapacity = capacity*2;
-    // Else if it is less than
-    // lowerboundratio half the capacity
-    else if (rehashValue < lower_bound_ratio)
-        newCapacity = capacity/2;
+    // Depending on the option, find
+    // the new capacity
+    if (option == 'a') {
+        if (rehashValue > upper_bound_ratio)
+            newCapacity = capacity*2;
+    }
+    else if (option == 'r')  {
+        if (rehashValue < lower_bound_ratio)
+            newCapacity = capacity/2;
+    }
     
     // If there is no need for rehash
     // return
     if (newCapacity == -1)
         return;
+    
+    // Copy the words inside the
+    // hashTable in a buffer
+    int bufferSize = size;
+    string buffer[bufferSize];
 
-    // Make a new hashTable with the
-    // new capacity
-    HashTable newht(newCapacity);
-
-    // Add the old hashTable elements
-    // to the new one
-    for (int i = 0; i < capacity; i++)
+    for (int i = 0, j = 0; i < capacity; i++)
         if (!isAvailable(i))
-            newht.add(*table[i]);
+            buffer[j++] = *table[i];
 
-    // Deallocate memory of the previous
-    // hashTable
+    // Deallocate hashTable memory
     for (int i = 0; i < capacity; i++)
         if (table[i] != nullptr)
             delete table[i];
     delete[] table;
+    
+    // Make a new hashTable with
+    // new capacity and copy the
+    // words inside the buffer to
+    // the new hashTable
+    capacity = newCapacity;
+    size = 0;
+    table = new string*[capacity];
 
-    // Copy the new hashtable to the 
-    // old one
-    (HashTable) *this = newht;
+    for (int i = 0; i < capacity; i++)
+        table[i] = nullptr;
 
-    cout << "Size: " << size; 
+    for (int i = 0, j = 0; i < bufferSize; i++)
+        HashTable::add(buffer[j++]);
+
+    cout << "--> Size: " << size; 
     cout << ", New capacity: " << capacity << endl;  
 }
 
 // ***add***
 bool ExtHashTable::add(const string& str) {
     if (HashTable::add(str)) {
-        rehash();
+        rehash('a');
         return true;
     }
     return false;
@@ -71,7 +81,7 @@ bool ExtHashTable::add(const string& str) {
 // ***add***
 bool ExtHashTable::add(const char* s) {
     if (HashTable::add(s)) {
-        rehash();
+        rehash('a');
         return true;
     }
     return false;
@@ -80,7 +90,7 @@ bool ExtHashTable::add(const char* s) {
 // ***remove***
 bool ExtHashTable::remove(const string& str) {
     if (HashTable::remove(str)) {
-        rehash();
+        rehash('r');
         return true;
     }
     return false;
@@ -89,7 +99,7 @@ bool ExtHashTable::remove(const string& str) {
 // ***remove***
 bool ExtHashTable::remove(const char* s) {
     if (HashTable::remove(s)) {
-        rehash();
+        rehash('r');
         return true;
     }
     return false;
@@ -97,10 +107,20 @@ bool ExtHashTable::remove(const char* s) {
 
 // ***operator=***
 ExtHashTable& ExtHashTable::operator=(const ExtHashTable& t) {
-    HashTable ht(t);
-    (HashTable) *this = ht;
+    for (int i = 0; i < capacity; i++)
+        if (table[i] != nullptr)
+            delete table[i];
+    delete[] table;
+    
+    size = t.size;
+    capacity = t.capacity;
     upper_bound_ratio = t.upper_bound_ratio;
     lower_bound_ratio = t.lower_bound_ratio;
+    table = new string*[capacity];
+
+    for (int i = 0; i < capacity; i++)
+        if (!t.isAvailable(i))
+            HashTable::add(*t.table[i]);
 
     return *this;
 }

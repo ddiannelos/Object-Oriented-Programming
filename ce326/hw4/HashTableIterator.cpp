@@ -22,7 +22,10 @@ HashTable::Iterator::Iterator(const HashTable* t, bool start) {
 HashTable::Iterator::Iterator(const Iterator& it){
     position = it.position;
     ht = it.ht;
-    curr = new string*(*it.curr);
+    if (it.curr == nullptr)
+        curr = nullptr;
+    else
+        curr = new string*(*it.curr);
 }
 
 // ***operator=***
@@ -87,7 +90,7 @@ HashTable::Iterator HashTable::Iterator::operator++(int a) {
 bool HashTable::Iterator::operator==(const Iterator& it) const {
     // Check if position and curr
     // are the same
-    if (position != it.position || *curr != *it.curr)
+    if (position != it.position || curr != it.curr)
         return false;
     
     // Check if the hashTable is the
