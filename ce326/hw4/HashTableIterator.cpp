@@ -8,8 +8,8 @@ HashTable::Iterator::Iterator(const HashTable* t, bool start) {
         for (int i = 0; i < ht->capacity; i++)
             if (!ht->isAvailable(i)) {
                 position = i;
-                curr = new string*(ht->table[i]);
-                
+                curr = (ht->table)+i;
+
                 return;
             }
     }
@@ -25,14 +25,14 @@ HashTable::Iterator::Iterator(const Iterator& it){
     if (it.curr == nullptr)
         curr = nullptr;
     else
-        curr = new string*(*it.curr);
+        curr = it.curr;
 }
 
 // ***operator=***
 HashTable::Iterator& HashTable::Iterator::operator=(const Iterator& it) {
     position = it.position;
     ht = it.ht;
-    curr = new string*(*it.curr);
+    curr = it.curr;
 
     return (*this);
 }
@@ -46,13 +46,12 @@ HashTable::Iterator HashTable::Iterator::operator++() {
     // hashTable
     for (position += 1; position < ht->capacity; position++)
         if (!ht->isAvailable(position)) {
-            *curr = ht->table[position];
+            curr = (ht->table) + position;
             break;
         }
     // If the end of the hashTable is
     // reached delete curr
     if (position == ht->capacity) {
-        delete curr;
         curr = nullptr;
     }
 
@@ -71,13 +70,12 @@ HashTable::Iterator HashTable::Iterator::operator++(int a) {
     // hashTable
     for (position += 1; position < ht->capacity; position++)
         if (!ht->isAvailable(position)) {
-            *curr = ht->table[position];
+            curr = (ht->table) + position;
             break;
         }
     // If the end of the hashTable is
     // reached delete curr
     if (position == ht->capacity) {
-        delete curr;
         curr = nullptr;
     }
 
@@ -88,21 +86,7 @@ HashTable::Iterator HashTable::Iterator::operator++(int a) {
 
 // ***operator==***
 bool HashTable::Iterator::operator==(const Iterator& it) const {
-    // Check if position and curr
-    // are the same
-    if (position != it.position || curr != it.curr)
-        return false;
-    
-    // Check if the hashTable is the
-    // same
-    if (ht->size != it.ht->size || ht->capacity != it.ht->capacity)
-        return false;
-    
-    for (int i = 0; i < ht->capacity; i++)
-        if (ht->table[i] != it.ht->table[i])
-            return false;
-    
-    return true;
+    return (position == it.position && curr == it.curr && ht == it.ht);
 }
 
 // ***operator!=***

@@ -44,10 +44,11 @@ unsigned long HashTable::getHashCode(const char* str) {
     unsigned long hash = 97;
     int c;
 
-    while ((c = *(str++)) != '\0') 
-        hash = ((hash << 5) + hash) + c;
-    
+    while ((c = *(str++)) != '\0')
+        hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+
     return hash;
+
 }
 
 // ***getSize***
@@ -207,8 +208,8 @@ string HashTable::print() const {
 
 // ***operator=***
 HashTable& HashTable::operator=(const HashTable& t) {
-    // If a hashTable already exists then
-    // delete everything inside
+    // Delete the hashTable that was
+    // previously allocated
     for (int i = 0; i < capacity; i++)
             if (table[i] != nullptr)
                 delete table[i];
