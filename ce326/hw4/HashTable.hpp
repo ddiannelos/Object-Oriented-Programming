@@ -6,7 +6,7 @@
 
 using namespace std;
 
-#define TOMB "0xFFFF"
+#define TOMB (string *)0xFF
 
 class HashTable {    
     protected:

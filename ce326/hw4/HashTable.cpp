@@ -28,7 +28,6 @@ HashTable::HashTable(const HashTable& ht) {
         }
         else
             table[i] = nullptr;
-    
 }
 
 // ***Deconstructor***
@@ -44,11 +43,11 @@ unsigned long HashTable::getHashCode(const char* str) {
     unsigned long hash = 97;
     int c;
 
-    while ((c = *(str++)) != '\0')
+    while ((c = *(str++)) != '\0') {
         hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+    }
 
     return hash;
-
 }
 
 // ***getSize***
@@ -70,10 +69,10 @@ bool HashTable::isEmpty(int pos) const {
 
 // ***isTomb***
 bool HashTable::isTomb(int pos) const {
-    if (pos >= capacity || (table[pos] != nullptr && *table[pos] != TOMB))
+    if (pos >= capacity || table[pos] != TOMB)
         return false;
     return true;
-}
+} 
 
 // ***isAvailable***
 bool HashTable::isAvailable(int pos) const {
@@ -86,7 +85,7 @@ bool HashTable::add(const string& s) {
         return false;
     
     // // Get the hashCode for the string
-    unsigned long hashCode = getHashCode(s.c_str());
+    const unsigned long hashCode = getHashCode(s.c_str());
     int i, pos;
 
     // // Check if the string already
@@ -109,12 +108,8 @@ bool HashTable::add(const string& s) {
         HashTableException exception;
         throw exception;
     }
-
-    // Insert the string to
-    // the hashTable
-    if (isEmpty(pos))
-        table[pos] = new string;
     
+    table[pos] = new string;
     *table[pos] = s;
     size++;
 
@@ -132,7 +127,7 @@ bool HashTable::remove(const string& s) {
         return false;
     
     // Get the hashCode of the string
-    unsigned long hashCode = getHashCode(s.c_str());
+    const unsigned long hashCode = getHashCode(s.c_str());
     int i, pos;
 
     // Try to find the string in
@@ -152,7 +147,8 @@ bool HashTable::remove(const string& s) {
     if (i == capacity)
         return false;
 
-    *table[pos] = TOMB;
+    delete table[pos];
+    table[pos] = TOMB;
     size--;
 
     return true;
@@ -169,7 +165,7 @@ bool HashTable::contains(const string& s) const {
         return false;
     
     // Get the hashCode of the string
-    unsigned long hashCode = getHashCode(s.c_str());
+    const unsigned long hashCode = getHashCode(s.c_str());
 
     // Try to find the string inside
     // the hashTable
@@ -178,7 +174,7 @@ bool HashTable::contains(const string& s) const {
         
         if (isEmpty(pos))
             return false;
-        else if (*table[pos] == s)
+        else if (!isTomb(pos) && *table[pos] == s)
             return true;
     }
     return false;

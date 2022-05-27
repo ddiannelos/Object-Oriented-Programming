@@ -9,14 +9,11 @@
 using namespace std;
 
 int main(int argc, char *argv[]) {
-    HashTable h;
-
-    h.add("i");
-    h.add("like");
-    h.add("playing");
-    h.add("league");
+    HashTable h(12);
+    h.add("coffee");
+    h.add("sugar");
+    h.add("orangejuice");
+    h.add("tea");
+    h.add("lemonade");
     cout << h << endl;
-
-    for (HashTable::Iterator it = h.begin(); it != h.end(); it++)
-        cout << it.pos() << endl;
 }
