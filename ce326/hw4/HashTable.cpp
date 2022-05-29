@@ -22,18 +22,18 @@ HashTable::HashTable(const HashTable& ht) {
 
     table = new string*[capacity];
     for (int i = 0; i < capacity; i++)
-        if (ht.table[i] != nullptr) {
+        if (!ht.isAvailable(i)) {
             table[i] = new string;
             *table[i] = *ht.table[i];
         }
         else
-            table[i] = nullptr;
+            table[i] = ht.table[i];
 }
 
 // ***Deconstructor***
 HashTable::~HashTable() {
     for (int i = 0; i < capacity; i++)
-        if (table[i] != nullptr)
+        if (!isAvailable(i))
             delete table[i];
     delete[] table;
 }
@@ -43,9 +43,8 @@ unsigned long HashTable::getHashCode(const char* str) {
     unsigned long hash = 97;
     int c;
 
-    while ((c = *(str++)) != '\0') {
+    while ((c = *(str++)) != '\0')
         hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
-    }
 
     return hash;
 }
@@ -84,36 +83,34 @@ bool HashTable::add(const string& s) {
     if (s == "")
         return false;
     
-    // // Get the hashCode for the string
-    const unsigned long hashCode = getHashCode(s.c_str());
-    int i, pos;
+    // Get the hashCode for the string
+    unsigned long hashCode = getHashCode(s.c_str());
+    int originalPos = hashCode%capacity;
+    int pos = originalPos;
 
-    // // Check if the string already
-    // // exsists in the hashTable
-    if (contains(s)) {
+    // Check if the string already
+    // exsists in the hashTable
+    if (contains(s))
         return false;
-    }
 
-    // // Check if an available position
-    // // exists in the hashTable
-    for (i = 0; i < capacity; i++) {
-        pos = (i + hashCode) % capacity;
-        
-        if (isAvailable(pos))
-            break;
-    }
+    // Check if an available position
+    // exists in the hashTable
+    do {
+        if (isAvailable(pos)) {
+            table[pos] = new string;
+            *table[pos] = s;
+            size++;
+
+            return true;
+        }
+            
+        pos = (++hashCode)%capacity;
+    } while (pos != originalPos);
+
     // If there is no space for the
-    // string throw exception
-    if (i == capacity) {
-        HashTableException exception;
-        throw exception;
-    }
-    
-    table[pos] = new string;
-    *table[pos] = s;
-    size++;
-
-    return true;
+    // string throw exception   
+    HashTableException exception;
+    throw exception;
 }
 
 // ***add***
@@ -127,31 +124,27 @@ bool HashTable::remove(const string& s) {
         return false;
     
     // Get the hashCode of the string
-    const unsigned long hashCode = getHashCode(s.c_str());
-    int i, pos;
+    unsigned long hashCode = getHashCode(s.c_str());
+    int originalPos = hashCode%capacity;
+    int pos = originalPos;
 
     // Try to find the string in
-    // the hashTable
-    for (i = 0; i < capacity; i++) {
-        pos = (i + hashCode) % capacity;
-        
+    // the hashTable and remove it
+    do {
         if (isEmpty(pos))
             return false;
-        else if (*table[pos] == s)
-            break;
-    }
-    
-    // If the string doesn't exist
-    // in the hashTable return, else
-    // remove it
-    if (i == capacity)
-        return false;
+        else if (!isTomb(pos) && *table[pos] == s) {
+            delete table[pos];
+            table[pos] = TOMB;
+            size--;
 
-    delete table[pos];
-    table[pos] = TOMB;
-    size--;
+            return true;
+        }
 
-    return true;
+        pos = (++hashCode)%capacity;
+    } while (pos != originalPos);
+
+    return false;
 }
 
 // ***remove***
@@ -165,18 +158,20 @@ bool HashTable::contains(const string& s) const {
         return false;
     
     // Get the hashCode of the string
-    const unsigned long hashCode = getHashCode(s.c_str());
+    unsigned long hashCode = getHashCode(s.c_str());
+    int originalPos = hashCode%capacity;
+    int pos = originalPos;
 
     // Try to find the string inside
     // the hashTable
-    for (int i = 0; i < capacity; i++) {
-        int pos = (i + hashCode) % capacity;
-        
+    do {
         if (isEmpty(pos))
             return false;
         else if (!isTomb(pos) && *table[pos] == s)
             return true;
-    }
+        pos = (++hashCode)%capacity;
+    } while (pos != originalPos);
+    
     return false;
 }
 
@@ -207,8 +202,8 @@ HashTable& HashTable::operator=(const HashTable& t) {
     // Delete the hashTable that was
     // previously allocated
     for (int i = 0; i < capacity; i++)
-            if (table[i] != nullptr)
-                delete table[i];
+        if (!isAvailable(i))
+            delete table[i];
     delete[] table;
     
     // Copy the contents of t
@@ -217,12 +212,12 @@ HashTable& HashTable::operator=(const HashTable& t) {
     table = new string*[capacity];
 
     for (int i = 0; i < capacity; i++)
-        if (t.table[i] != nullptr) {
+        if (!t.isAvailable(i)) {
             table[i] = new string;
             *table[i] = *t.table[i];
         }
         else
-            table[i] = nullptr;
+            table[i] = t.table[i];
     
     return *this;
 }

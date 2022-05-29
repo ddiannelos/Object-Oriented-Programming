@@ -47,7 +47,7 @@ void ExtHashTable::rehash(char option) {
 
     // Deallocate hashTable memory
     for (int i = 0; i < capacity; i++)
-        if (table[i] != nullptr)
+        if (!isAvailable(i))
             delete table[i];
     delete[] table;
     
@@ -71,8 +71,8 @@ void ExtHashTable::rehash(char option) {
 
 // ***add***
 bool ExtHashTable::add(const string& str) {
+    rehash('a');
     if (HashTable::add(str)) {
-        rehash('a');
         return true;
     }
     return false;
@@ -80,8 +80,8 @@ bool ExtHashTable::add(const string& str) {
 
 // ***add***
 bool ExtHashTable::add(const char* s) {
+    rehash('a');
     if (HashTable::add(s)) {
-        rehash('a');
         return true;
     }
     return false;
@@ -108,7 +108,7 @@ bool ExtHashTable::remove(const char* s) {
 // ***operator=***
 ExtHashTable& ExtHashTable::operator=(const ExtHashTable& t) {
     for (int i = 0; i < capacity; i++)
-        if (table[i] != nullptr)
+        if (!isAvailable(i))
             delete table[i];
     delete[] table;
     
@@ -119,8 +119,12 @@ ExtHashTable& ExtHashTable::operator=(const ExtHashTable& t) {
     table = new string*[capacity];
 
     for (int i = 0; i < capacity; i++)
-        if (!t.isAvailable(i))
-            HashTable::add(*t.table[i]);
+        if (!t.isAvailable(i)) {
+            table[i] = new string;
+            *table[i] = *t.table[i];
+        }
+        else
+            table[i] = t.table[i];
 
     return *this;
 }
@@ -129,7 +133,6 @@ ExtHashTable& ExtHashTable::operator=(const ExtHashTable& t) {
 ExtHashTable ExtHashTable::operator+(const string& str) const {
     ExtHashTable newht(*this);
     newht.add(str);
-
     return newht;
 }
 
@@ -137,7 +140,6 @@ ExtHashTable ExtHashTable::operator+(const string& str) const {
 ExtHashTable ExtHashTable::operator+(const char* s) const {
     ExtHashTable newht(*this);
     newht.add(s);
-
     return newht;
 }
 
@@ -145,7 +147,6 @@ ExtHashTable ExtHashTable::operator+(const char* s) const {
 ExtHashTable ExtHashTable::operator-(const string& str) const {
     ExtHashTable newht(*this);
     newht.remove(str);
-
     return newht;
 }
 
@@ -153,7 +154,6 @@ ExtHashTable ExtHashTable::operator-(const string& str) const {
 ExtHashTable ExtHashTable::operator-(const char* s) const {
     ExtHashTable newht(*this);
     newht.remove(s);
-
     return newht;
 }
 
