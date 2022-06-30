@@ -14,9 +14,7 @@ struct Edge {
     T from;
     T to;
     int dist;
-    Edge(T f, T t, int d) : from(f), to(t), dist(d) {
-
-    }
+    Edge(T f, T t, int d) : from(f), to(t), dist(d) {}
     bool operator<(const Edge<T>& e) const {
         return (dist < e.dist);
     }
@@ -51,10 +49,9 @@ class Graph {
         bool rmvEdg(const T& from, const T& to);
         list<T> dfs(const T& info) const;
         list<T> bfs(const T& info) const;
-        list<Edge<T>> mst();
-        
-        void print2DotFile(const char *filename) const;
         list<T> dijkstra(const T& from, const T& to);
+        list<Edge<T>> mst();
+        void print2DotFile(const char *filename) const;
 };
 
 //***Constructor***
@@ -67,16 +64,15 @@ Graph<T>::Graph(bool isDirectedGraph) {
 // ***Deconstructor***
 template <typename T>
 Graph<T>::~Graph() {
-
 }
 
 // ***contains***
 template <typename T>
 bool Graph<T>::contains(const T& info) {
     // Search in the vector to find
-    // the verticle
+    // the vertices
     for (int i = 0; i < size; i++)
-        if (edges[i].begin().from == info)
+        if (edges[i].begin()->from == info)
             return true;
 
     return false;
@@ -90,7 +86,7 @@ bool Graph<T>::addVtx(const T& info) {
     if (contains(info))
         return false;
     
-    // Insert the new verticle
+    // Insert the new vertices
     edges.resize(++size);
     edges[size-1].push_back(Edge<T>(info, info, -1));
 
@@ -110,14 +106,14 @@ bool Graph<T>::rmvVtx(const T& info) {
     typename vector<list<Edge<T>>>::iterator vit = edges.begin();
 
     for (; vit != edges.end(); vit++)
-        if (vit.front().from == info)
+        if (vit.front()->from == info)
             break;
     
     edges.erase(vit);
     edges.resize(--size);
 
     // Remove the edges that connect
-    // to the removed verticle
+    // to the removed vertices
     for (int i = 0; i < size; i++) {
         rmvEdg(edges[i].begin()->from, info);
     }
@@ -205,18 +201,18 @@ template <typename T>
 void Graph<T>::dfs(const T& info, bool visited[], list<T> dfs) {
     // Find info, check if info
     // is already visited and if 
-    // it is not insert it in the list
+    // it is not, insert it in the list
     // and dfs every neighbor
     for (int i = 0; i < size; i++)
-        if (edges[i].begin().from == info) {
+        if (edges[i].begin()->from == info) {
             if (visited[i] == true)
                 return;
             
             visited[i] = true;
-            dfs.push_back(edges[i].begin().from);
+            dfs.push_back(edges[i].begin()->from);
 
             for (typename list<Edge<T>>::iterator it = edges[i].begin(); it != edges[i].end(); it++)
-                dfs(it.to, visited, dfs);
+                dfs(it->to, visited, dfs);
         }
 }
 
@@ -232,6 +228,53 @@ list<T> Graph<T>::dfs(const T& info) const {
     dfs(info, visited, dfs);
     
     return dfs;
+}
+
+// ***bfs***
+template <typename T>
+list<T> Graph<T>::bfs(const T& info) const {
+    bool visited[size];
+    list<T> queue;
+    list<T> bfs;
+
+    for (int i = 0; i < size; i++)
+        visited[i] = false;
+
+    // Insert info to the queue
+    for (int i = 0; i < size; i++)
+        if (edges[i].begin->from == info) {
+            visited[i] = true;
+            queue.push_back(info);
+        }
+    
+    // While queue is not empty take the
+    // first vertice of the queue, add it to the
+    // bfs list and then for every neighbor of
+    // the vertice check if it is visited. If
+    // it isn't then mark it as visited and add
+    // it in the queue
+    while (!queue.empty()) {
+        T vtx = queue.front();
+        queue.pop_front();
+        bfs.push_back(vtx);
+        
+        for (int i = 0; i < size; i++)
+            if (edges[i].begin->from == vtx) {
+                for (typename list<Edge<T>>::iterator it = edges[i].begin(); it != edges[i].end(); it++) {
+                    int j = 0;
+                    for (; j < size; j++)
+                        if (edges[j].begin()->front == it->to)
+                            break;
+                    
+                    if (visited[j] == false) {
+                        visited[j] = true;
+                        queue.push_back(it->to);
+                    }
+                }
+            }
+    }
+
+    return bfs;
 }
 
 #endif
