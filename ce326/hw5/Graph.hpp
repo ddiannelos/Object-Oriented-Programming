@@ -5,7 +5,7 @@
 #include <list>
 #include <vector>
 #include <iterator>
-#include <typeinfo>
+#include <limits>
 
 using namespace std;
 
@@ -70,7 +70,7 @@ Graph<T>::~Graph() {
 template <typename T>
 bool Graph<T>::contains(const T& info) {
     // Search in the vector to find
-    // the vertices
+    // the vertex
     for (int i = 0; i < size; i++)
         if (edges[i].begin()->from == info)
             return true;
@@ -86,7 +86,7 @@ bool Graph<T>::addVtx(const T& info) {
     if (contains(info))
         return false;
     
-    // Insert the new vertices
+    // Insert the new vertex
     edges.resize(++size);
     edges[size-1].push_back(Edge<T>(info, info, -1));
 
@@ -113,7 +113,7 @@ bool Graph<T>::rmvVtx(const T& info) {
     edges.resize(--size);
 
     // Remove the edges that connect
-    // to the removed vertices
+    // to the removed vertex
     for (int i = 0; i < size; i++) {
         rmvEdg(edges[i].begin()->from, info);
     }
@@ -248,12 +248,12 @@ list<T> Graph<T>::bfs(const T& info) const {
         }
     
     // While queue is not empty take the
-    // first vertice of the queue, add it to the
+    // first vertex of the queue, add it to the
     // bfs list and then for every neighbor of
-    // the vertice check if it is visited. If
+    // the vertex check if it is visited. If
     // it isn't then mark it as visited and add
     // it in the queue
-    while (!queue.empty()) {
+    while (queue.empty() == false) {
         T vtx = queue.front();
         queue.pop_front();
         bfs.push_back(vtx);
@@ -275,6 +275,98 @@ list<T> Graph<T>::bfs(const T& info) const {
     }
 
     return bfs;
+}
+
+// ***dijkstra***
+template <typename T>
+list<T> dijkstra(const T& from, const T& to) {
+    int distance[size];
+    int prev[size];
+    list<T> dijkstra;
+    list<T> queue;
+
+    // Set the distance of every vertex
+    // except "from" to INT_MAX and add
+    // every vertex on the queue
+    for (int i = 0; i < size; i++) {
+        if (edges[i].begin()->from == from)
+            distance[i] = 0;
+        else
+            distance[i] = INT_MAX;
+
+        queue.push_back(edges[i].begin()->from);
+    }
+
+    // While the queue is not empty
+    while (queue.empty() == false) {        
+        // Find the vertex with the min
+        // distance
+        int min = distance[0];
+        int minPos = 0;
+
+        for (int i = 1; i < size; i++)
+            if (min > distance[i]) {
+                min = distance[i];
+                minPos = i;
+            }
+        
+        // Save the value of the vertex, check 
+        // if it is the destination, if it is not
+        // remove it from the queue        
+        if ((vtx = (queue.begin()+minPos)->from) == to)
+            break;
+        
+        queue.erase(queue.begin()+minPos);
+        
+        // Find the vertex and for each neighbor
+        // that it is not in the queue set the distance
+        // accordingly
+        for (int i = 0; i < size; i++)
+            if (edges[i].begin()->from == vtx) {
+                typename list<Edge<T>>::iterator lit = edges[i].begin();
+
+                for (; lit != edges[i].end(); lit++) {
+                    typename list<T> qit = queue.begin();
+
+                    for (; qit != queue.end(); qit++)
+                        if (lit->to == *qit)
+                            break;
+                    
+                    if (qit == queue.end())
+                        continue;
+                    
+                    int pos;
+
+                    for (pos = 0; pos < size; pos++)
+                        if (edges[j].begin()->from == lit->to)
+                            break;
+                    
+                    int dist = min + list->dest
+                    
+                    if (dist < distance[pos]) {
+                        distance[pos] = dist;
+                        prev[pos] = i;
+                    }
+                }
+            }
+    }
+
+    // Add the route to a list
+    for (int i = 0; i < size; i++)
+        if (edges[i].begin()->from == to) {
+            if (distance[i] == INT_MAX)
+                return dijkstra;
+            
+            int pos = i;
+
+            while (edges[pos].begin()->from != from) {
+                dijkstra.push_front(edges[pos].begin()->from);
+                pos = prev[pos];
+            }
+            dijstra.push_front(edges[pos].begin()->from);
+        }
+    
+    return dijkstra;
 }
 
 #endif
