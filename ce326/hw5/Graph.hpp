@@ -37,7 +37,9 @@ class Graph {
     int size;
     bool isDirected;
     
-    void dfs(const T& info, bool *visited, list<T> dfs);
+    void dfs(const T& info, bool visited[], list<T> dfs);
+    void findMinDist(int distance[], int& min, int& minPos);
+    list<T> getRoute(const T& from, const T& to, int distance[], int prev[]);
 
     public:
         Graph(bool isDirectedGraph = true);
@@ -277,12 +279,44 @@ list<T> Graph<T>::bfs(const T& info) const {
     return bfs;
 }
 
+// ***findMinDist***
+template <typename T>
+void Graph<T>::findMinDist(int distance[], int& min, int& minPos) {
+    min = distance[0];
+    minPos = 0;
+
+    for (int i = 1; i < size; i++)
+        if (min > distance[i]) {
+            min = distance[i];
+            minPos = i;
+        }
+}
+
+template <typename T>
+list<T> Graph<T>::getRoute(const T& from, const T& to, int distance[], int prev[]) {
+    list<T> dijkstra;
+
+    for (int i = 0; i < size; i++)
+        if (edges[i].begin()->from == to) {
+            if (distance[i] == INT_MAX)
+                return dijkstra;
+            
+            int pos = i;
+
+            while (edges[pos].begin()->from != from) {
+                dijkstra.push_front(edges[pos].begin()->from);
+                pos = prev[pos];
+            }
+            dijstra.push_front(edges[pos].begin()->from);
+        }
+
+    return dijkstra;
+}
 // ***dijkstra***
 template <typename T>
-list<T> dijkstra(const T& from, const T& to) {
+list<T> Graph<T>::dijkstra(const T& from, const T& to) {
     int distance[size];
     int prev[size];
-    list<T> dijkstra;
     list<T> queue;
 
     // Set the distance of every vertex
@@ -301,15 +335,9 @@ list<T> dijkstra(const T& from, const T& to) {
     while (queue.empty() == false) {        
         // Find the vertex with the min
         // distance
-        int min = distance[0];
-        int minPos = 0;
+        int min, minPos;
+        findMinDist(distance, &min, &minPos);
 
-        for (int i = 1; i < size; i++)
-            if (min > distance[i]) {
-                min = distance[i];
-                minPos = i;
-            }
-        
         // Save the value of the vertex, check 
         // if it is the destination, if it is not
         // remove it from the queue        
@@ -351,22 +379,7 @@ list<T> dijkstra(const T& from, const T& to) {
             }
     }
 
-    // Add the route to a list
-    for (int i = 0; i < size; i++)
-        if (edges[i].begin()->from == to) {
-            if (distance[i] == INT_MAX)
-                return dijkstra;
-            
-            int pos = i;
-
-            while (edges[pos].begin()->from != from) {
-                dijkstra.push_front(edges[pos].begin()->from);
-                pos = prev[pos];
-            }
-            dijstra.push_front(edges[pos].begin()->from);
-        }
-    
-    return dijkstra;
+    return getRoute(from, to, distance, prev);
 }
 
 #endif
