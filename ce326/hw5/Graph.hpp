@@ -120,23 +120,6 @@ bool Graph<T>::rmvVtx(const T& info) {
     // to the removed verticle
     for (int i = 0; i < size; i++) {
         rmvEdg(edges[i].begin()->from, info);
-        // typename list<Edge<T>>::iterator lit = edges[i].begin();
-    
-        // for (; lit != edges[i].end(); lit++) {
-        //     rmvEdg(lit->from, info);
-        //     if (lit->to == info) {
-        //         if (edges[i].size() == 1) {
-        //             lit->to = lit->from;
-        //             lit->dest = -1;
-        //         }
-        //         else {
-        //             list<Edge<T>>::iterator tempit = lit;
-        //             lit++;
-        //             edges[i].erase(tempit);
-        //             lit--;
-        //         } 
-        //     }
-        // }
     }
 
     return true;
