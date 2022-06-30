@@ -3,6 +3,7 @@
 #define _GRAPH_HPP_
 
 #include <list>
+#include <vector>
 #include <iterator>
 #include <typeinfo>
 
@@ -34,7 +35,7 @@ std::ostream& operator<<(std::ostream& out, const Edge<T>& e) {
 
 template <typename T>
 class Graph {
-    list<Edge<T>> *edges;
+    vector<list<Edge<T>>> edges;
     int size;
     bool isDirected;
     
@@ -59,7 +60,6 @@ class Graph {
 //***Constructor***
 template <typename T>
 Graph<T>::Graph(bool isDirectedGraph) {
-    edges = nullptr;
     size = 0;
     isDirected = isDirectedGraph;
 }
@@ -73,7 +73,7 @@ Graph<T>::~Graph() {
 // ***contains***
 template <typename T>
 bool Graph<T>::contains(const T& info) {
-    // Search in the array to find
+    // Search in the vector to find
     // the verticle
     for (int i = 0; i < size; i++)
         if (edges[i].begin().from == info)
@@ -86,32 +86,13 @@ bool Graph<T>::contains(const T& info) {
 template <typename T>
 bool Graph<T>::addVtx(const T& info) {
     // Check if info exists in
-    // the array
+    // the vector
     if (contains(info))
         return false;
     
-    // If the graph is empty
-    // create it and insert 
-    // the verticle
-    if (size == 0) {
-        edges = new list<Edge<T>>[++size];
-        edges[0].push_back(Edge<T>(info, info, -1));
-    }
-    // Else copy the contents of the
-    // previous list to a new one and
-    // insert the new verticle
-    else {
-        list<Edge<T>> *newlist = new list<Edge<T>>[++size];
-
-        for (int i = 0; i < size-1; i++)
-            for (typename list<Edge<T>>::iterator it = edges[i].begin(); it != edges[i].end(); it++)
-                newlist[i].push_back(it);
-            
-        newlist[size-1].push_back(Edge<T>(info, info, -1));
-        
-        delete[] edges;
-        edges = newlist;
-    }
+    // Insert the new verticle
+    edges.resize(++size);
+    edges[size-1].push_back(Edge<T>(info, info, -1));
 
     return true;
 }
@@ -124,28 +105,39 @@ bool Graph<T>::rmvVtx(const T& info) {
     if (contains(info) == false)
         return false;
     
-    // Create a new array and
-    // copy the contents of teh
-    // previous array except info
-    list<Edge<T>> *newlist = new list<Edge<T>>[--size];
+    // Find info in the vector and
+    // remove it
+    typename vector<list<Edge<T>>>::iterator vit = edges.begin();
 
-    for (int i = 0, j = 0; i < size+1; i++) {
-        if (edges[i].begin().from == info) {
-            continue;
-        }
+    for (; vit != edges.end(); vit++)
+        if (vit.front().from == info)
+            break;
+    
+    edges.erase(vit);
+    edges.resize(--size);
 
-        for (typename list<Edge<T>>::iterator it = edges[i].begin(); it != edges[i].end(); it++) {
-            if (it.to == info)
-                continue;
-            
-            newlist[j].push_back(it);
-        }
-
-        j++;
+    // Remove the edges that connect
+    // to the removed verticle
+    for (int i = 0; i < size; i++) {
+        rmvEdg(edges[i].begin()->from, info);
+        // typename list<Edge<T>>::iterator lit = edges[i].begin();
+    
+        // for (; lit != edges[i].end(); lit++) {
+        //     rmvEdg(lit->from, info);
+        //     if (lit->to == info) {
+        //         if (edges[i].size() == 1) {
+        //             lit->to = lit->from;
+        //             lit->dest = -1;
+        //         }
+        //         else {
+        //             list<Edge<T>>::iterator tempit = lit;
+        //             lit++;
+        //             edges[i].erase(tempit);
+        //             lit--;
+        //         } 
+        //     }
+        // }
     }
-
-    delete[] edges;
-    edges = newlist;
 
     return true;
 }
@@ -160,15 +152,15 @@ bool Graph<T>::addEdg(const T& from, const T& to, int cost) {
     // Check if from exists in the graph and
     // if it does, add an edge
     for (int i = 0; i < size; i++)
-        if (edges[i].begin().from == from) {
+        if (edges[i].begin()->from == from) {
             // Check if the edge exists
             for (typename list<Edge<T>>::iterator it = edges[i].begin(); it != edges[i].end(); it++)
                 if (it.to == to)
                     return false;
             
-            if (edges[i].begin().from == edges[i].begin().to) {
-                edges[i].begin().to = to;
-                edges[i].begin().dest = cost;
+            if (edges[i].size() == 1) {
+                edges[i].begin()->to = to;
+                edges[i].begin()->dest = cost;
             }
             else 
                 edges[i].push_back(Edge<T>(from, to, cost));
@@ -176,15 +168,7 @@ bool Graph<T>::addEdg(const T& from, const T& to, int cost) {
             // If the graph is not directed insert
             // the edge from "to" to "from"
             if (isDirected == false) {
-                for (int j = 0; j < size; j++)
-                    if (edges[j].begin().from == to) {
-                        if (edges[j].begin().from == edges[j].begin().to) {
-                            edges[j].begin().to = from;
-                            edges[j].begin().dest = cost;
-                        }
-                        else
-                            edges[j].push_back(Edge<T>(to, from, cost));
-                    }
+                addEdg(to, from, cost);
             }
         
             return true;
@@ -204,7 +188,7 @@ bool Graph<T>::rmvEdg(const T& from, const T& to) {
     // and if it does, try to find the edge
     // and remove it
     for (int i = 0; i < size; i++)
-        if (edges[i].begin().from == from) {
+        if (edges[i].begin()->from == from) {
             typename list<Edge<T>>::iterator it = edges[i].begin();
 
             for (; it != edges[i].end(); it++)
@@ -215,8 +199,8 @@ bool Graph<T>::rmvEdg(const T& from, const T& to) {
                 return false;
 
             if (edges[i].size() == 1) {
-                edges[i].begin().to = edges[i].begin().from;
-                edges[i].begin().dest = -1;
+                edges[i].begin()->to = edges[i].begin()->from;
+                edges[i].begin()->dest = -1;
             }
             else
                 edges[i].erase(it);
@@ -224,22 +208,7 @@ bool Graph<T>::rmvEdg(const T& from, const T& to) {
             // If graph is not directed remove the
             // edge from "to" to "from"
             if (isDirected == false) {
-                for (int j = 0; j < size; j++)
-                    if (edges[j].begin().from == to) {
-                        it = edges[j].begin();
-
-                        for (; it != edges[j].end(); it++)
-                            if (it.to == from)
-                                break;
-                        
-                        if (edges[j].size() == 1) {
-                            edges[j].begin().to = edges[j].begin().from;
-                            edges[j].begin().dist = -1;
-                        }
-                        else
-                            edges[j].erase(it);
-
-                    }
+                rmvEdg(edges[i].begin()->to, edges[i].begin()->from);
             }
 
             return true;
