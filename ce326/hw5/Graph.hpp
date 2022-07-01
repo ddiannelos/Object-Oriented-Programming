@@ -1,11 +1,14 @@
-
 #ifndef _GRAPH_HPP_ 
 #define _GRAPH_HPP_
 
+#include <iostream>
 #include <list>
 #include <vector>
 #include <iterator>
-#include <limits>
+#include <climits>
+#include <fstream>
+#include <string>
+#include "UnionFind.hpp"
 
 using namespace std;
 
@@ -14,13 +17,11 @@ struct Edge {
     T from;
     T to;
     int dist;
+    
     Edge(T f, T t, int d) : from(f), to(t), dist(d) {}
-    bool operator<(const Edge<T>& e) const {
-        return (dist < e.dist);
-    }
-    bool operator>(const Edge<T>& e) const {
-        return (dist > e.dist);
-    }
+    bool operator<(const Edge<T>& e) const { return (dist < e.dist); }
+    bool operator>(const Edge<T>& e) const { return (dist > e.dist); }
+    
     template<typename U>
     friend std::ostream& operator<<(std::ostream& out, const Edge<U>& e);
 };
@@ -307,7 +308,7 @@ list<T> Graph<T>::getRoute(const T& from, const T& to, int distance[], int prev[
                 dijkstra.push_front(edges[pos].begin()->from);
                 pos = prev[pos];
             }
-            dijstra.push_front(edges[pos].begin()->from);
+            dijkstra.push_front(edges[pos].begin()->from);
         }
 
     return dijkstra;
@@ -341,7 +342,9 @@ list<T> Graph<T>::dijkstra(const T& from, const T& to) {
         // Save the value of the vertex, check 
         // if it is the destination, if it is not
         // remove it from the queue        
-        if ((vtx = (queue.begin()+minPos)->from) == to)
+        T vtx = (queue.begin()+minPos)->from;
+        
+        if (vtx == to)
             break;
         
         queue.erase(queue.begin()+minPos);
@@ -354,7 +357,7 @@ list<T> Graph<T>::dijkstra(const T& from, const T& to) {
                 typename list<Edge<T>>::iterator lit = edges[i].begin();
 
                 for (; lit != edges[i].end(); lit++) {
-                    typename list<T> qit = queue.begin();
+                    typename list<T>::iterator qit = queue.begin();
 
                     for (; qit != queue.end(); qit++)
                         if (lit->to == *qit)
@@ -366,10 +369,10 @@ list<T> Graph<T>::dijkstra(const T& from, const T& to) {
                     int pos;
 
                     for (pos = 0; pos < size; pos++)
-                        if (edges[j].begin()->from == lit->to)
+                        if (edges[pos].begin()->from == lit->to)
                             break;
                     
-                    int dist = min + list->dest
+                    int dist = min + lit->dest;
                     
                     if (dist < distance[pos]) {
                         distance[pos] = dist;
@@ -380,6 +383,87 @@ list<T> Graph<T>::dijkstra(const T& from, const T& to) {
     }
 
     return getRoute(from, to, distance, prev);
+}
+
+// ***mst***
+template <typename T>
+list<Edge<T>> Graph<T>::mst() {
+    list<Edge<T>> mst;
+    list<Edge<T>> edgs;
+    list<T> vtx;
+
+    // Check if the graph is directed
+    if (isDirected == true)
+        return mst;
+
+    // Insert the vertexes and edges
+    // to lists
+    for (int i = 0; i < size; i++) {
+        typename list<Edge<T>>::iterator it = edges[i].begin();
+
+        for (; it != edges[i].end(); it++)
+            if (it->from != it->to)
+                edgs.push_back(*it);
+        
+        vtx.push_back(edges[i].begin->from);
+    }
+
+    // Sort the edges and create
+    // a unionfind object
+    edgs.sort();
+    UnionFind<T> unionfind = UnionFind<T>(size, vtx);
+
+    // While the edges list is not empty
+    // pick the lowest cost edge and check
+    // if it creates a circle, if it is not
+    // union the 2 vertexes and insert the edge
+    // to the mst list
+    while (edgs.empty() == false) {
+        Edge<T> edg = edgs.front();
+        edgs.pop_front();
+
+        int from = unionfind._find(edg.from);
+        int to = unionfind._find(edg.to);
+
+        if (from != to) {
+            mst.push_back(edg);
+            unionfind._union(edg.from, edg.to);
+        }
+    }
+
+    return mst;
+}
+
+// ***print2DotFile***
+template <typename T>
+void Graph<T>::print2DotFile(const char *filename) const {
+    ofstream file;
+    file.open(filename);
+
+    if (isDirected == true)
+        file << "digraph G {" << endl;
+    else
+        file << "graph G {" << endl;
+    
+    for (int i = 0; i < size; i++) {
+        string symbol;
+        
+        if (isDirected == true)
+            symbol = " -> ";
+        else
+            symbol = " -- ";
+        
+        typename list<Edge<T>>::iterator it = edges[i].begin();
+
+        for (; it != edges[i].end(); it++) {
+            file << "\t" << edges[i].from;
+            file << symbol << it->to << ";" << endl;
+        }
+    }
+
+    file << "}";
+
+    file.close();
 }
 
 #endif
