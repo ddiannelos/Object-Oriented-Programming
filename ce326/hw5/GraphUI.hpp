@@ -3,12 +3,11 @@
 #define _GRAPH_UI_
 
 #include <string>
-#include "Graph.hpp";
+#include "Graph.hpp"
 
 template <typename T>
 int graphUI() {  
     string option, line;
-    int distance;
     bool digraph = false;
   
     cin >> option;
@@ -48,7 +47,8 @@ int graphUI() {
             
             T from(stream);
             T to(stream);
-            int cost(stream);
+            int cost;
+            stream >> cost;
             
             if (g.addEdg(from, to, cost))
                 cout << "ae " << from << " " << to << " OK\n";
@@ -71,9 +71,10 @@ int graphUI() {
             getline(std::cin, line);
             stream << line;
             
-            string filename(stream);
+            string filename;
+            stream >> filename;
             
-            if (g.print2DotFile(filename))
+            if (g.print2DotFile(filename.c_str()))
                 cout << "dot " << filename << " OK\n";
             else
                 cout << "dot " << filename << " NOK\n";
@@ -135,11 +136,11 @@ int graphUI() {
             cout << "\n--- Min Spanning Tree ---\n";
             cout << *it++;
             
-            sum += it->dest;
+            sum += it->dist;
             
             for (; it != mst.end(); it++) {
                 cout << " " << *it;
-                sum += it->dest;
+                sum += it->dist;
             }
             
             cout << "\nMST Cost: " << sum << endl;

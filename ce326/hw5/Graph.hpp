@@ -38,7 +38,7 @@ class Graph {
     int size;
     bool isDirected;
     
-    void dfs(const T& info, bool visited[], list<T> dfs);
+    void dfs(const T& info, bool visited[], list<T> dfs) const;
     void findMinDist(int distance[], int& min, int& minPos);
     list<T> getRoute(const T& from, const T& to, int distance[], int prev[]);
 
@@ -109,7 +109,7 @@ bool Graph<T>::rmvVtx(const T& info) {
     typename vector<list<Edge<T>>>::iterator vit = edges.begin();
 
     for (; vit != edges.end(); vit++)
-        if (vit.front()->from == info)
+        if (vit->front().from == info)
             break;
     
     edges.erase(vit);
@@ -137,12 +137,12 @@ bool Graph<T>::addEdg(const T& from, const T& to, int cost) {
         if (edges[i].begin()->from == from) {
             // Check if the edge exists
             for (typename list<Edge<T>>::iterator it = edges[i].begin(); it != edges[i].end(); it++)
-                if (it.to == to)
+                if (it->to == to)
                     return false;
             
             if (edges[i].size() == 1) {
                 edges[i].begin()->to = to;
-                edges[i].begin()->dest = cost;
+                edges[i].begin()->dist = cost;
             }
             else 
                 edges[i].push_back(Edge<T>(from, to, cost));
@@ -174,7 +174,7 @@ bool Graph<T>::rmvEdg(const T& from, const T& to) {
             typename list<Edge<T>>::iterator it = edges[i].begin();
 
             for (; it != edges[i].end(); it++)
-                if (it.to == to)
+                if (it->to == to)
                     break;
             
             if (it == edges[i].end())
@@ -182,7 +182,7 @@ bool Graph<T>::rmvEdg(const T& from, const T& to) {
 
             if (edges[i].size() == 1) {
                 edges[i].begin()->to = edges[i].begin()->from;
-                edges[i].begin()->dest = -1;
+                edges[i].begin()->dist = -1;
             }
             else
                 edges[i].erase(it);
@@ -201,7 +201,7 @@ bool Graph<T>::rmvEdg(const T& from, const T& to) {
 
 // ***dfs***
 template <typename T>
-void Graph<T>::dfs(const T& info, bool visited[], list<T> dfs) {
+void Graph<T>::dfs(const T& info, bool visited[], list<T> dfsl) const {
     // Find info, check if info
     // is already visited and if 
     // it is not, insert it in the list
@@ -212,10 +212,10 @@ void Graph<T>::dfs(const T& info, bool visited[], list<T> dfs) {
                 return;
             
             visited[i] = true;
-            dfs.push_back(edges[i].begin()->from);
+            dfsl.push_back(edges[i].begin()->from);
 
-            for (typename list<Edge<T>>::iterator it = edges[i].begin(); it != edges[i].end(); it++)
-                dfs(it->to, visited, dfs);
+            for (typename list<Edge<T>>::const_iterator it = edges[i].begin(); it != edges[i].end(); it++)
+                dfs(it->to, visited, dfsl);
         }
 }
 
@@ -223,14 +223,14 @@ void Graph<T>::dfs(const T& info, bool visited[], list<T> dfs) {
 template <typename T>
 list<T> Graph<T>::dfs(const T& info) const {
     bool visited[size];
-    list<T> dfs;
+    list<T> dfsl;
 
     for (int i = 0; i < size; i++)
         visited[i] = false;
 
-    dfs(info, visited, dfs);
+    dfs(info, visited, dfsl);
     
-    return dfs;
+    return dfsl;
 }
 
 // ***bfs***
@@ -245,7 +245,7 @@ list<T> Graph<T>::bfs(const T& info) const {
 
     // Insert info to the queue
     for (int i = 0; i < size; i++)
-        if (edges[i].begin->from == info) {
+        if (edges[i].begin()->from == info) {
             visited[i] = true;
             queue.push_back(info);
         }
@@ -262,11 +262,11 @@ list<T> Graph<T>::bfs(const T& info) const {
         bfs.push_back(vtx);
         
         for (int i = 0; i < size; i++)
-            if (edges[i].begin->from == vtx) {
-                for (typename list<Edge<T>>::iterator it = edges[i].begin(); it != edges[i].end(); it++) {
+            if (edges[i].begin()->from == vtx) {
+                for (typename list<Edge<T>>::const_iterator it = edges[i].begin(); it != edges[i].end(); it++) {
                     int j = 0;
                     for (; j < size; j++)
-                        if (edges[j].begin()->front == it->to)
+                        if (edges[j].begin()->from == it->to)
                             break;
                     
                     if (visited[j] == false) {
@@ -337,17 +337,23 @@ list<T> Graph<T>::dijkstra(const T& from, const T& to) {
         // Find the vertex with the min
         // distance
         int min, minPos;
-        findMinDist(distance, &min, &minPos);
+        findMinDist(distance, min, minPos);
 
         // Save the value of the vertex, check 
         // if it is the destination, if it is not
         // remove it from the queue        
-        T vtx = (queue.begin()+minPos)->from;
+        typename list<T>::iterator qit = queue.begin();
+
+        for (int i = 0; qit != queue.end(); qit++, i++)
+            if (i == minPos)
+                break;
+        
+        T vtx = *qit;
         
         if (vtx == to)
             break;
         
-        queue.erase(queue.begin()+minPos);
+        queue.erase(qit);
         
         // Find the vertex and for each neighbor
         // that it is not in the queue set the distance
@@ -372,7 +378,7 @@ list<T> Graph<T>::dijkstra(const T& from, const T& to) {
                         if (edges[pos].begin()->from == lit->to)
                             break;
                     
-                    int dist = min + lit->dest;
+                    int dist = min + lit->dist;
                     
                     if (dist < distance[pos]) {
                         distance[pos] = dist;
@@ -405,7 +411,7 @@ list<Edge<T>> Graph<T>::mst() {
             if (it->from != it->to)
                 edgs.push_back(*it);
         
-        vtx.push_back(edges[i].begin->from);
+        vtx.push_back(edges[i].begin()->from);
     }
 
     // Sort the edges and create
@@ -453,10 +459,10 @@ bool Graph<T>::print2DotFile(const char *filename) const {
         else
             symbol = " -- ";
         
-        typename list<Edge<T>>::iterator it = edges[i].begin();
+        typename list<Edge<T>>::const_iterator it = edges[i].begin();
 
         for (; it != edges[i].end(); it++) {
-            file << "\t" << edges[i].from;
+            file << "\t" << edges[i].begin()->from;
             file << symbol << it->to << ";" << endl;
         }
     }
