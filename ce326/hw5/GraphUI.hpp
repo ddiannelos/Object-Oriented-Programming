@@ -134,12 +134,11 @@ int graphUI() {
             typename list<Edge<T>>::iterator it = mst.begin();
             
             cout << "\n--- Min Spanning Tree ---\n";
-            cout << *it++;
-            
             sum += it->dist;
-            
+            cout << *(it++);
+
             for (; it != mst.end(); it++) {
-                cout << " " << *it;
+                cout << endl << *it;
                 sum += it->dist;
             }
             
