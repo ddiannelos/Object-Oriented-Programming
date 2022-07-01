@@ -2,6 +2,9 @@
 #ifndef _GRAPH_UI_
 #define _GRAPH_UI_
 
+#include <string>
+#include "Graph.hpp";
+
 template <typename T>
 int graphUI() {  
     string option, line;
@@ -20,44 +23,126 @@ int graphUI() {
         if(!option.compare("av")) {
             getline(std::cin, line);
             stream << line;
+            
             T vtx(stream);
+            
             if(g.addVtx(vtx))
                 cout << "av " << vtx << " OK\n";
             else
                 cout << "av " << vtx << " NOK\n";
         }
         else if(!option.compare("rv")) {
-
+            getline(std::cin, line);
+            stream << line;
+            
+            T vtx(stream);
+            
+            if (g.rmvVtx(vtx))
+                cout << "rv " << vtx << " OK\n";
+            else
+                cout << "rv " << vtx << " NOK\n";
         }
         else if(!option.compare("ae")) {
-      
+            getline(std::cin, line);
+            stream << line;
+            
+            T from(stream);
+            T to(stream);
+            int cost(stream);
+            
+            if (g.addEdg(from, to, cost))
+                cout << "ae " << from << " " << to << " OK\n";
+            else
+                cout << "ae " << from << " " << to << " NOK\n";
         }
         else if(!option.compare("re")) {
-
+            getline(std::cin, line);
+            stream << line;
+            
+            T from(stream);
+            T to(stream);
+            
+            if (g.rmvEdg(from, to))
+                cout << "re " << from << " " << to << " OK\n";
+            else
+                cout << "re " << from << " " << to << " NOK\n";
         }
         else if(!option.compare("dot")) {
-      
+            getline(std::cin, line);
+            stream << line;
+            
+            string filename(stream);
+            
+            if (g.print2DotFile(filename))
+                cout << "dot " << filename << " OK\n";
+            else
+                cout << "dot " << filename << " NOK\n";
         }
         else if(!option.compare("bfs")) {
+            getline(std::cin, line);
+            stream << line;
+            
+            T vtx(stream);
+            list<T> bfs = g.bfs(vtx);
+            typename list<T>::iterator it = bfs.begin();
+            
             cout << "\n----- BFS Traversal -----\n";
+            cout << *(it++);
+            
+            for (; it != bfs.end(); it++)
+                cout << " -> " << *it;
+            
             cout << "\n-------------------------\n";
         }
         else if(!option.compare("dfs")) {
-          cout << "\n----- DFS Traversal -----\n";
-          cout << "\n-------------------------\n";
+            getline(std::cin, line);
+            stream << line;
+
+            T vtx(stream);
+            list<T> dfs = g.dfs(vtx);
+            typename list<T>::iterator it = dfs.begin();
+            
+            cout << "\n----- DFS Traversal -----\n";
+            cout << *(it++);
+            
+            for (; it != dfs.end(); it++)
+                cout << " -> " << *it;
+            
+            cout << "\n-------------------------\n";
         }
         else if(!option.compare("dijkstra")) {
             getline(std::cin, line);
             stream << line;
+            
             T from(stream);
             T to(stream);
-
+            list<T> dijkstra = g.dijkstra(from, to);
+            typename list<T>::iterator it = dijkstra.begin();
+            
             cout << "Dijkstra (" << from << " - " << to <<"): ";
-      
+            cout << *(it++);
+            
+            for (; it != dijkstra.end(); it++)
+                cout << ", " << *it;
+            
+            cout << "\n-------------------------\n";
         }
         else if(!option.compare("mst")) {
-          cout << "\n--- Min Spanning Tree ---\n";
-          cout << "MST Cost: " << sum << endl;
+            int sum = 0;
+            list<Edge<T>> mst = g.mst();
+            typename list<Edge<T>>::iterator it = mst.begin();
+            
+            cout << "\n--- Min Spanning Tree ---\n";
+            cout << *it++;
+            
+            sum += it->dest;
+            
+            for (; it != mst.end(); it++) {
+                cout << " " << *it;
+                sum += it->dest;
+            }
+            
+            cout << "\nMST Cost: " << sum << endl;
         }
         else if(!option.compare("q")) {
             cerr << "bye bye...\n";

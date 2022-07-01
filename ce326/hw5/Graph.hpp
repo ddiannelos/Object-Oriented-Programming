@@ -54,7 +54,7 @@ class Graph {
         list<T> bfs(const T& info) const;
         list<T> dijkstra(const T& from, const T& to);
         list<Edge<T>> mst();
-        void print2DotFile(const char *filename) const;
+        bool print2DotFile(const char *filename) const;
 };
 
 //***Constructor***
@@ -436,7 +436,7 @@ list<Edge<T>> Graph<T>::mst() {
 
 // ***print2DotFile***
 template <typename T>
-void Graph<T>::print2DotFile(const char *filename) const {
+bool Graph<T>::print2DotFile(const char *filename) const {
     ofstream file;
     file.open(filename);
 
@@ -464,6 +464,8 @@ void Graph<T>::print2DotFile(const char *filename) const {
     file << "}";
 
     file.close();
+
+    return true;
 }
 
 #endif
