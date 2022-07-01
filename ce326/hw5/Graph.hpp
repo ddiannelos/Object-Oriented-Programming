@@ -91,7 +91,7 @@ bool Graph<T>::addVtx(const T& info) {
     
     // Insert the new vertex
     edges.resize(++size);
-    edges[size-1].push_back(Edge<T>(info, info, -1));
+    edges[size-1].push_back(Edge<T>(info, info, INT_MAX));
 
     return true;
 }
@@ -140,7 +140,7 @@ bool Graph<T>::addEdg(const T& from, const T& to, int cost) {
                 if (it->to == to)
                     return false;
             
-            if (edges[i].size() == 1) {
+            if (edges[i].begin()->dist == INT_MAX) {
                 edges[i].begin()->to = to;
                 edges[i].begin()->dist = cost;
             }
@@ -182,7 +182,7 @@ bool Graph<T>::rmvEdg(const T& from, const T& to) {
 
             if (edges[i].size() == 1) {
                 edges[i].begin()->to = edges[i].begin()->from;
-                edges[i].begin()->dist = -1;
+                edges[i].begin()->dist = INT_MAX;
             }
             else
                 edges[i].erase(it);
@@ -444,26 +444,39 @@ list<Edge<T>> Graph<T>::mst() {
 template <typename T>
 bool Graph<T>::print2DotFile(const char *filename) const {
     ofstream file;
+    string symbol;
+    list<Edge<T>> queue;
+    
     file.open(filename);
 
-    if (isDirected == true)
+    if (isDirected == true) {
         file << "digraph G {" << endl;
-    else
+        symbol = " -> ";
+    }
+    else {
         file << "graph G {" << endl;
+        symbol = " -- ";
+    }   
     
-    for (int i = 0; i < size; i++) {
-        string symbol;
-        
-        if (isDirected == true)
-            symbol = " -> ";
-        else
-            symbol = " -- ";
-        
+    for (int i = 0; i < size; i++) {        
         typename list<Edge<T>>::const_iterator it = edges[i].begin();
 
         for (; it != edges[i].end(); it++) {
+            if (isDirected == false) {
+                typename list<Edge<T>>::iterator qit = queue.begin();
+                
+                for (; qit != queue.end(); qit++)
+                    if (qit->from == it->to && qit->to == it->from)
+                        break;
+                
+                if (qit != queue.end())
+                    continue;
+            }
+
             file << "\t" << edges[i].begin()->from;
-            file << symbol << it->to << ";" << endl;
+            file << symbol << it->to;
+            file << " [label=\"" << it->dist << "\"];" << endl;
+            queue.push_back(*it);
         }
     }
 

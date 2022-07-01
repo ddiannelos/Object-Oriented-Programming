@@ -47,4 +47,4 @@ dijkstra4:
 run: bfs1 bfs2 bfs3 dfs1 dfs2 dfs3 mst1 mst2 mst3 dijkstra1 dijkstra2 dijkstra3 dijkstra4
 
 clean:
-	rm -rf bfs1 bfs1.out graph.ps gint gstr gstudent
+	rm -rf bfs* dfs* mst* dijkstra* graph.ps gint gstr gstudent
