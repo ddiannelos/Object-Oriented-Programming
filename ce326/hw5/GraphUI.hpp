@@ -121,12 +121,14 @@ int graphUI() {
             typename list<T>::iterator it = dijkstra.begin();
             
             cout << "Dijkstra (" << from << " - " << to <<"): ";
-            cout << *(it++);
+            if (it != dijkstra.end()) {
+                cout << *(it++);
+                
+                for (; it != dijkstra.end(); it++)
+                    cout << ", " << *it;
+            }
             
-            for (; it != dijkstra.end(); it++)
-                cout << ", " << *it;
-            
-            cout << "\n-------------------------\n";
+            cout << endl;
         }
         else if(!option.compare("mst")) {
             int sum = 0;

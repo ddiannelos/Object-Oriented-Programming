@@ -40,7 +40,8 @@ class Graph {
     
     int findPos(const T& info) const;
     void dfs(const T& info, bool visited[], list<T> *dfsl) const;
-    void findMinDist(int distance[], int& min, int& minPos);
+    T findMinDistVtx(int distance[], list<T> *queue, int& minDist);
+    bool inQueue(const T& info, list<T> queue);
     list<T> getRoute(const T& from, const T& to, int distance[], int prev[]);
 
     public:
@@ -298,26 +299,48 @@ list<T> Graph<T>::bfs(const T& info) const {
     return bfs;
 }
 
-// ***findMinDist***
+// ***findMinDistVtx***
 template <typename T>
-void Graph<T>::findMinDist(int distance[], int& min, int& minPos) {
-    min = distance[0];
-    minPos = 0;
+T Graph<T>::findMinDistVtx(int distance[], list<T> *queue, int& minDist) {
+    typename list<T>::iterator qit = queue->begin();
+    typename list<T>::iterator minqit;
+    minqit = qit;
+    minDist = distance[findPos(*qit)];
 
-    for (int i = 1; i < size; i++)
-        if (min > distance[i]) {
-            min = distance[i];
-            minPos = i;
+    for (; qit != queue->end(); qit++) {
+        int pos = findPos(*qit);
+        if (minDist > distance[pos]) {
+            minDist = distance[pos];
+            minqit = qit;
         }
+    }
+    T vtx = *minqit;
+    queue->erase(minqit);
+    
+    return vtx;
 }
 
+// ***inQueue***
+template <typename T>
+bool Graph<T>::inQueue(const T& info, list<T> queue) {
+    typename list<T>::iterator qit = queue.begin();
+
+    for (qit = queue.begin(); qit != queue.end(); qit++)
+        if (*qit == info)
+            return true;
+    
+    return false;
+}
+
+
+// ***getRoute***
 template <typename T>
 list<T> Graph<T>::getRoute(const T& from, const T& to, int distance[], int prev[]) {
     list<T> dijkstra;
 
     int pos = findPos(to);
 
-    if (distance[pos] == INT_MAX)
+    if (prev[pos] == -1)
         return dijkstra;
 
     while (edges[pos].begin()->from != from) {
@@ -328,6 +351,7 @@ list<T> Graph<T>::getRoute(const T& from, const T& to, int distance[], int prev[
 
     return dijkstra;
 }
+
 // ***dijkstra***
 template <typename T>
 list<T> Graph<T>::dijkstra(const T& from, const T& to) {
@@ -335,68 +359,51 @@ list<T> Graph<T>::dijkstra(const T& from, const T& to) {
     int prev[size];
     list<T> queue;
 
-    if (contains(from) == false || contains(to) == false) {
-        list<T> dijkstra;
-        return dijkstra;
-    }
-    // Set the distance of every vertex
-    // except "from" to INT_MAX and add
-    // every vertex on the queue
+    // Set the distance of all vertexes to
+    // infinity except the source and add
+    // all the vertexes to the queue
     for (int i = 0; i < size; i++) {
         if (edges[i].begin()->from == from)
             distance[i] = 0;
         else
             distance[i] = INT_MAX;
 
+        prev[i] = -1;
         queue.push_back(edges[i].begin()->from);
     }
 
     // While the queue is not empty
-    while (queue.empty() == false) {        
-        // Find the vertex with the min
-        // distance
-        int min, minPos;
-        findMinDist(distance, min, minPos);
+    while (queue.empty() == false) {
+        typename list<T>::iterator minqit;
+        int minDist;
 
-        // Save the value of the vertex, check 
-        // if it is the destination, if it is not
-        // remove it from the queue        
-        typename list<T>::iterator qit = queue.begin();
-
-        for (int i = 0; qit != queue.end(); qit++, i++)
-            if (i == minPos)
-                break;
-        
-        T vtx = *qit;
+        // Find the vertex in queue with the minimum
+        // distance and remove it from the queue
+        T vtx = findMinDistVtx(distance, &queue, minDist);
         
         if (vtx == to)
             break;
         
-        queue.erase(qit);
-        
-        // Find the vertex and for each neighbor
-        // that it is not in the queue set the distance
+        // Find the neighbors of the vertex
+        // that are still in the queue and
+        // set their distance and prev 
         // accordingly
         int pos = findPos(vtx);
 
         typename list<Edge<T>>::iterator lit = edges[pos].begin();
 
         for (; lit != edges[pos].end(); lit++) {
-            typename list<T>::iterator qit = queue.begin();
-
-            for (; qit != queue.end(); qit++)
-                if (lit->to == *qit)
-                    break;
-            
-            if (qit == queue.end())
+            if (inQueue(lit->to, queue) == false)
                 continue;
             
-            int nextPos = findPos(lit->to);            
-            int dist = min + lit->dist;
-            
-            if (dist < distance[nextPos]) {
-                distance[nextPos] = dist;
-                prev[nextPos] = pos;
+            if (minDist != INT_MAX) {
+                int alt = minDist + lit->dist;
+                int nextPos = findPos(lit->to);
+
+                if (alt < distance[nextPos]) {
+                    distance[nextPos] = alt;
+                    prev[nextPos] = pos;
+                }
             }
         }
     }
