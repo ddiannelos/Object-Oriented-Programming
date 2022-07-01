@@ -39,7 +39,7 @@ class Graph {
     bool isDirected;
     
     int findPos(const T& info) const;
-    void dfs(const T& info, bool visited[], list<T> dfs) const;
+    void dfs(const T& info, bool visited[], list<T> *dfsl) const;
     void findMinDist(int distance[], int& min, int& minPos);
     list<T> getRoute(const T& from, const T& to, int distance[], int prev[]);
 
@@ -215,7 +215,7 @@ bool Graph<T>::rmvEdg(const T& from, const T& to) {
 
 // ***dfs***
 template <typename T>
-void Graph<T>::dfs(const T& info, bool visited[], list<T> dfsl) const {
+void Graph<T>::dfs(const T& info, bool visited[], list<T> *dfsl) const {
     // Find info, check if info
     // is already visited and if 
     // it is not, insert it in the list
@@ -226,7 +226,7 @@ void Graph<T>::dfs(const T& info, bool visited[], list<T> dfsl) const {
         return;
     
     visited[pos] = true;
-    dfsl.push_back(edges[pos].begin()->from);
+    dfsl->push_back(edges[pos].begin()->from);
 
     for (typename list<Edge<T>>::const_iterator it = edges[pos].begin(); it != edges[pos].end(); it++)
         dfs(it->to, visited, dfsl);
@@ -244,7 +244,7 @@ list<T> Graph<T>::dfs(const T& info) const {
     for (int i = 0; i < size; i++)
         visited[i] = false;
 
-    dfs(info, visited, dfsl);
+    dfs(info, visited, &dfsl);
     
     return dfsl;
 }
