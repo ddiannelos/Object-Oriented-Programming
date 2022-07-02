@@ -46,7 +46,7 @@ class Graph {
 
     public:
         Graph(bool isDirectedGraph = true);
-        //~Graph();
+        ~Graph();
         bool contains(const T& info) const;
         bool addVtx(const T& info);
         bool rmvVtx(const T& info);
@@ -66,10 +66,10 @@ Graph<T>::Graph(bool isDirectedGraph) {
     isDirected = isDirectedGraph;
 }
 
-// // ***Deconstructor***
-// template <typename T>
-// Graph<T>::~Graph() {
-// }
+// ***Deconstructor***
+template <typename T>
+Graph<T>::~Graph() {
+}
 
 // ***findPos***
 template <typename T>
